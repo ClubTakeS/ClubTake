@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLUB Take | The Hidden Circle</title>
+    <!-- Google Fonts: 魔法的な雰囲気のためのフォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Shippori+Mincho:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS (for layout utility) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --color-bg: #0a0b0a;
+            --color-text: #e0d8c3;
+            --color-gold: #c5a059;
+            --color-gold-dim: #8a6e38;
+            --color-earth-green: #1a2f23;
+            --color-earth-brown: #3e2723;
+            --cursor-size: 20px;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: 'Shippori Mincho', 'Cormorant Garamond', serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            cursor: none; /* デフォルトカーソルを隠す */
+        }
+
+        /* カスタムカーソル（魔法の光） */
+        #cursor-follower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            border: 1px solid rgba(197, 160, 89, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: exclusion;
+        }
+
+        #cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 4px;
+            background-color: var(--color-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--color-gold), 0 0 20px var(--color-gold);
+        }
+
+        /* 魔法の背景キャンバス */
+        #magic-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* タイポグラフィと装飾 */
+        h1, h2, h3 {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .text-gold {
+            color: var(--color-gold);
+            text-shadow: 0 0 5px rgba(197, 160, 89, 0.3);
+        }
+
+        /* スクロール時の出現アニメーション（霧の中から現れるような） */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            filter: blur(10px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-element.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* 浮遊アニメーション */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 魔法の境界線 */
+        .magic-border {
+            position: relative;
+            padding: 2rem;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            background: linear-gradient(to bottom, rgba(26, 47, 35, 0.2), rgba(10, 11, 10, 0.8));
+            transition: all 0.5s ease;
+        }
+
+        .magic-border::before, .magic-border::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 1px solid var(--color-gold);
+            transition: all 0.5s ease;
+        }
+
+        .magic-border::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .magic-border::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+        .magic-border:hover {
+            border-color: rgba(197, 160, 89, 0.6);
+            background: linear-gradient(to bottom, rgba(26, 47, 35, 0.4), rgba(10, 11, 10, 0.9));
+            box-shadow: 0 0 30px rgba(26, 47, 35, 0.5);
+        }
+
+        /* ニュースペーパー風のグリッドアイテム */
+        .artifact-card {
+            background-color: #0f1210;
+            border: 1px solid #333;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .artifact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-color: var(--color-gold-dim);
+        }
+
+        .artifact-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+
+        .artifact-card:hover::after {
+            left: 150%;
+            transition: 0.7s;
+        }
+
+        /* 招待状ボタン */
+        .btn-magic {
+            background: transparent;
+            color: var(--color-gold);
+            border: 1px solid var(--color-gold);
+            padding: 1rem 3rem;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: none; /* カスタムカーソルを使用するため */
+        }
+
+        .btn-magic:hover {
+            background: rgba(197, 160, 89, 0.1);
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
+            text-shadow: 0 0 8px var(--color-gold);
+        }
+
+        .smoke-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, var(--color-bg) 90%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 特殊文字装飾 */
+        .drop-cap {
+            float: left;
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            line-height: 0.8;
+            margin-right: 0.5rem;
+            color: var(--color-gold);
+        }
+
+        /* 鹿のSVGスタイル */
+        .stag-icon {
+            fill: none;
+            stroke: var(--color-gold);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
+        .magic-border:hover .stag-icon {
+            opacity: 1;
+            filter: drop-shadow(0 0 8px var(--color-gold));
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- カスタムカーソル -->
+    <div id="cursor-follower"></div>
+    <div id="cursor-dot"></div>
+
+    <!-- 背景エフェクト -->
+    <canvas id="magic-canvas"></canvas>
+
+    <!-- ナビゲーション -->
+    <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference">
+        <div class="text-2xl font-bold tracking-widest text-gold opacity-80 hover:opacity-100 transition-opacity duration-300">
+            CLUB <span class="text-white">TAKE</span>
+        </div>
+        <div class="hidden md:flex space-x-8 text-xs tracking-[0.2em] text-gray-400">
+            <a href="#about" class="hover:text-gold transition-colors duration-300">ORIGIN</a>
+            <a href="#artifacts" class="hover:text-gold transition-colors duration-300">ARCHIVES</a>
+            <a href="#join" class="hover:text-gold transition-colors duration-300">PACT</a>
+        </div>
+        <div class="md:hidden">
+            <i data-lucide="menu" class="text-gold"></i>
+        </div>
+    </nav>
+
+    <!-- ヒーローセクション -->
+    <header class="relative h-screen flex flex-col justify-center items-center text-center px-4 overflow-hidden">
+        <div class="smoke-overlay"></div>
+        
+        <div class="z-10 reveal-element delay-100">
+            <p class="text-sm md:text-base tracking-[0.5em] text-gray-500 mb-6">MUNDANITY IS A VEIL</p>
+            <h1 class="text-5xl md:text-7xl lg:text-9xl font-bold text-white mb-2 floating" style="text-shadow: 0 10px 30px rgba(0,0,0,1);">
+                CLUB <span class="text-gold">TAKE</span>
+            </h1>
+            <div class="h-px w-24 bg-gold mx-auto my-8 opacity-50"></div>
+            <!-- テキストの差し替え -->
+            <div class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 leading-relaxed font-serif space-y-4 text-left">
+                <p>
+                    CLUB Take は、一般社会では交流することのない、高度な専門知識を持つ人々だけが集まる、排他的な社交クラブです。
+                </p>
+                <p class="text-base md:text-lg text-gray-400">
+                    当クラブへの入会は、「現在の所属や過去の実績」によって決まるものではありません。重要なのは、「クラブのルールを尊重し、真のプロフェッショナルとして行動する」という決意です。
+                </p>
+                <p class="text-base md:text-lg text-gray-400">
+                    この空間では、利害が対立する組織のメンバーは、いかなる敵対行為も厳しく禁じられ、互いに絶対的な中立性を維持しなければなりません。これは、外部の混乱から隔離された、信頼できる情報交換と協力のための保障です。
+                </p>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50">
+            <i data-lucide="chevron-down" class="text-gold w-8 h-8"></i>
+        </div>
+    </header>
+
+    <!-- マニフェスト（概要） -->
+    <section id="about" class="py-32 px-6 relative z-10 bg-gradient-to-b from-[#0a0b0a] via-[#0f1410] to-[#0a0b0a]">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="reveal-element">
+                    <div class="magic-border aspect-[3/4] flex items-center justify-center relative group overflow-hidden">
+                        <!-- 象徴的な図形（CSSで表現） -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-50 transition-opacity duration-700">
+                            <div class="w-64 h-64 border border-gold rounded-full flex items-center justify-center animate-[spin_15s_linear_infinite]">
+                                <div class="w-48 h-48 border border-gray-500 rotate-45"></div>
+                            </div>
+                        </div>
+                        <!-- 鹿のモチーフに変更 (SVG) -->
+                        <svg class="stag-icon w-40 h-40 relative z-10" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C8 2 4 5 4 9C4 13.8 7.5 18 12 22C16.5 18 20 13.8 20 9C20 5 16 2 12 2Z" stroke-opacity="0.5" />
+                            <path d="M8 9L6 6M16 9L18 6" />
+                            <path d="M9 6L7 3M15 6L17 3" />
+                            <path d="M12 13V17" />
+                            <path d="M12 13L10 11M12 13L14 11" />
+                            <path d="M9 9C9 9 10 10 12 10C14 10 15 9 15 9" />
+                            <circle cx="12" cy="15" r="1" fill="var(--color-gold)"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="reveal-element delay-200">
+                    <!-- 見出しとテキストの差し替え -->
+                    <h2 class="text-3xl md:text-4xl text-gold mb-8">設立と理念の継承</h2>
+                    <p class="text-gray-400 mb-6 leading-loose text-justify font-serif">
+                        <span class="drop-cap">C</span>LUB Takeの歴史は、2025年7月9日に始まります。この日付は、単に設立を意味するだけでなく、私たち会員全員が「外の世界のルールではなく、クラブの『義と信』の原則にのみ従う」という誓いを立てた「独立の日」として、永遠に記憶されます。
+                    </p>
+                    <p class="text-gray-400 mb-6 leading-loose text-justify font-serif">
+                        私たちは、この日を境に、社会的な対立や過去の因縁を一時的に脇に置き、以下の三つの柱に基づいて行動することを会員に求めます。
+                    </p>
+                    <div class="mt-8">
+                        <span class="text-xs tracking-[0.3em] text-gold border-b border-gold pb-1 inline-block">EST. 2025 - TOKYO BRANCH</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- アーカイブ（ギャラリー） -->
+    <section id="artifacts" class="py-32 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-20 reveal-element">
+                <h2 class="text-3xl text-white mb-4">Curated Artifacts</h2>
+                <p class="text-gray-500 tracking-widest text-sm">保管された遺物と記録</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="artifact-card p-8 reveal-element delay-100 group cursor-none">
+                    <div class="mb-6 flex justify-center">
+                        <i data-lucide="feather" class="w-12 h-12 text-gray-400 group-hover:text-gold transition-colors duration-500"></i>
+                    </div>
+                    <h3 class="text-xl text-center text-gray-200 mb-4 font-serif">Phoenix Quill</h3>
+                    <p class="text-sm text-gray-500 text-center leading-relaxed">
+                        決してインクが尽きることのない羽根ペン。所有者の深層心理を汲み取り、自動的に詩を綴る。
+                    </p>
+                    <div class="mt-6 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span class="text-[10px] text-gold tracking-widest border border-gold px-2 py-1">CLASS A OBJECT</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="artifact-card p-8 reveal-element delay-200 group cursor-none">
+                    <div class="mb-6 flex justify-center">
+                        <i data-lucide="gem" class="w-12 h-12 text-gray-400 group-hover:text-gold transition-colors duration-500"></i>
+                    </div>
+                    <h3 class="text-xl text-center text-gray-200 mb-4 font-serif">Memory Stone</h3>
+                    <p class="text-sm text-gray-500 text-center leading-relaxed">
+                        触れた者の最も鮮烈な記憶を光として保存する黒曜石。満月の夜にのみ再生可能。
+                    </p>
+                    <div class="mt-6 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span class="text-[10px] text-gold tracking-widest border border-gold px-2 py-1">CLASS B OBJECT</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="artifact-card p-8 reveal-element delay-300 group cursor-none">
+                    <div class="mb-6 flex justify-center">
+                        <i data-lucide="hourglass" class="w-12 h-12 text-gray-400 group-hover:text-gold transition-colors duration-500"></i>
+                    </div>
+                    <h3 class="text-xl text-center text-gray-200 mb-4 font-serif">Lost Hourglass</h3>
+                    <p class="text-sm text-gray-500 text-center leading-relaxed">
+                        砂が下から上へと流れる砂時計。過去の失敗を一度だけ修正する機会を与えると言われる。
+                    </p>
+                    <div class="mt-6 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <span class="text-[10px] text-gold tracking-widest border border-gold px-2 py-1">FORBIDDEN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 参加（フッター） -->
+    <section id="join" class="py-32 px-6 relative z-10 bg-[#0c0e0c]">
+        <div class="max-w-3xl mx-auto text-center reveal-element">
+            <div class="mb-10 inline-block p-4 border border-gray-800 rounded-full">
+                <i data-lucide="scroll" class="w-8 h-8 text-gold"></i>
+            </div>
+            <h2 class="text-4xl md:text-5xl text-white mb-8 font-serif">The Pact</h2>
+            <p class="text-gray-400 mb-12 text-lg leading-relaxed">
+                我々は沈黙を守り、影に生きる。<br>
+                もしあなたが「呼び声」を聞いたなら、下の封印を解きたまえ。
+            </p>
+            
+            <button class="btn-magic group">
+                <span class="relative z-10">BECOME A MEMBER</span>
+                <div class="absolute inset-0 bg-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left opacity-10"></div>
+            </button>
+
+            <div class="mt-24 pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 tracking-widest">
+                <p>&copy; 2025 CLUB TAKE. MAGICAL LAW APPLIES.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <span>PRIVACY</span>
+                    <span>TERMS</span>
+                    <span>OWL POST</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Lucide Iconsの初期化
+        lucide.createIcons();
+
+        // --------------------------------------------------------
+        // カーソルとパーティクルエフェクトのロジック
+        // --------------------------------------------------------
+        const cursor = document.getElementById('cursor-follower');
+        const dot = document.getElementById('cursor-dot');
+        const canvas = document.getElementById('magic-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let mouse = { x: -100, y: -100 };
+        let particles = [];
+
+        // キャンバスのリサイズ
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // マウス追従
+        document.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // カーソル要素の移動（少し遅延させて浮遊感を出す）
+            // CSS transitionで処理
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            dot.style.left = e.clientX + 'px';
+            dot.style.top = e.clientY + 'px';
+
+            // パーティクル生成（魔法の粉）
+            createParticles(3);
+        });
+
+        // クリック時のエフェクト
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            createParticles(10, true);
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        // リンクホバー時のカーソル変化
+        const links = document.querySelectorAll('a, button, .artifact-card');
+        links.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                cursor.style.width = '50px';
+                cursor.style.height = '50px';
+                cursor.style.borderColor = 'rgba(197, 160, 89, 0.8)';
+                cursor.style.backgroundColor = 'rgba(197, 160, 89, 0.1)';
+            });
+            link.addEventListener('mouseleave', () => {
+                cursor.style.width = '20px';
+                cursor.style.height = '20px';
+                cursor.style.borderColor = 'rgba(197, 160, 89, 0.5)';
+                cursor.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // パーティクルクラス
+        class Particle {
+            constructor(x, y, burst = false) {
+                this.x = x;
+                this.y = y;
+                // バースト時は四方に散らばる、通常は下に落ちる（重力）
+                const angle = burst ? Math.random() * Math.PI * 2 : Math.random() * Math.PI;
+                const speed = burst ? Math.random() * 3 + 1 : Math.random() * 0.5;
+                
+                this.vx = Math.cos(angle) * speed;
+                this.vy = burst ? Math.sin(angle) * speed : Math.random() * 1 + 0.5; // 少し下に落ちる
+                
+                this.life = Math.random() * 60 + 30; // 寿命
+                this.size = Math.random() * 2 + 0.5;
+                
+                // 色: ゴールド、白、薄い緑をランダムに
+                const colors = ['#c5a059', '#ffffff', '#2d4030', '#e0d8c3'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 抵抗
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+
+                // ふわふわさせる
+                this.x += Math.sin(this.life * 0.1) * 0.2;
+
+                this.life--;
+                this.alpha = this.life / 60; // フェードアウト
+            }
+
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // キラキラ効果
+                if (Math.random() > 0.9) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // アンビエントパーティクル（背景に漂う塵）
+        class AmbientParticle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.size = Math.random() * 1.5;
+                this.color = '#2d4030'; // 暗い緑
+                this.alpha = Math.random() * 0.3;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if(this.x < 0) this.x = width;
+                if(this.x > width) this.x = 0;
+                if(this.y < 0) this.y = height;
+                if(this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        let ambientParticles = [];
+        for(let i=0; i<30; i++) {
+            ambientParticles.push(new AmbientParticle());
+        }
+
+        function createParticles(count, burst = false) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(mouse.x, mouse.y, burst));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // マウス追従パーティクルの描画
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+
+            // 背景パーティクルの描画
+            for (let p of ambientParticles) {
+                p.update();
+                p.draw();
+            }
+
+            // マウス付近の光の表現（グロー）
+            if (mouse.x > 0) {
+                const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 100);
+                gradient.addColorStop(0, 'rgba(197, 160, 89, 0.05)');
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+
+        // --------------------------------------------------------
+        // スクロール時の「出現」アニメーション
+        // --------------------------------------------------------
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // 一度表示されたら監視を解除する場合
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-element').forEach(el => {
+            observer.observe(el);
+        });
+
+    </script>
+</body>
+</html>

@@ -142,13 +142,15 @@
         
         // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
         // Firestore の代わりに Realtime Database の機能を読み込みます
-        // import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getDatabase, ref, set, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // setLogLevel は database モジュールからはエクスポートされていないため、削除します
+        // import { getDatabase, ref, set, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
         
-        // デバッグ用のログを有効にします
-        setLogLevel('Debug');
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+        // setLogLevel('Debug'); // この行はエラーの原因となるため、コメントアウトします
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
         
         // あなたがFirebaseから取得した「本物の」設定情報をここに貼り付けました
         const firebaseConfig = {
@@ -161,11 +163,9 @@
           measurementId: "G-NVXMV89KHP"
         };
         
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
         // Realtime Database の URL を config に追加します
         // (さきほど作成した DB の URL です)
         firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
-        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
 
         // （注意）appId は、Firebase Config の appId を使うように変更します
@@ -180,11 +180,8 @@
             // Firebaseを初期化します
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
             // Firestore の代わりに Realtime Database を初期化します
-            // db = getFirestore(app);
             db = getDatabase(app);
-            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
@@ -294,13 +291,7 @@
                         const newUserId = userCredential.user.uid;
                         console.log('Authユーザー作成成功:', newUserId);
                         
-                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                         // 3. メインのDBインスタンス (Realtime Database) を使って、役割（Role）をデータベースに保存
-                        // const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, newUserId);
-                        // await setDoc(roleDocRef, {
-                        //     email: email,
-                        //     isAdmin: isAdmin // チェックボックスの状態を保存
-                        // });
                         
                         // Realtime Database の書き込みパスを指定
                         const roleRef = ref(db, `user_roles/${newUserId}`);
@@ -309,7 +300,6 @@
                             email: email,
                             isAdmin: isAdmin // チェックボックスの状態を保存
                         });
-                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
                         console.log('役割データベース(Realtime DB)への保存成功。');
 
@@ -333,14 +323,12 @@
                         } else if (error.code === 'auth/weak-password') {
                             messageEl.textContent = 'パスワードは6文字以上で入力してください。';
                         } else {
-                            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                             // Realtime Database 特有のエラー (permission_denied)
                             if (error.code === 'PERMISSION_DENIED') {
                                 messageEl.textContent = 'データベースへの書き込み権限がありません。';
                             } else {
                                 messageEl.textContent = '登録に失敗しました。';
                             }
-                            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                         }
                         messageEl.className = 'text-sm text-red-400 text-center';
                     }

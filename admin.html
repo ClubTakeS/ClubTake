@@ -222,21 +222,31 @@
                     } else {
                         // 管理者権限なし
                         console.log("管理者権限がありません。ログインページに戻ります。");
-                        if(pageError) pageError.textContent = "アクセス権限がありません。3秒後にログインページに戻ります。";
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                        if(pageError) pageError.textContent = "アクセス権限がありません。管理者としてログインしてください。";
+                        // 3秒タイマー（setTimeout）を削除（コメントアウト）します
+                        /*
                         setTimeout(() => {
                             const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
                             window.location.href = window.location.origin + repoPath + '/login.html';
                         }, 3000);
+                        */
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                     }
 
                 } else {
                     // ログインしていない（または匿名ユーザー）
                     console.log("管理者ページ：ユーザーが認識できません。ログインページに戻ります。");
-                    if(pageError) pageError.textContent = "ログインしていません。3秒後にログインページに戻ります。";
+                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                    if(pageError) pageError.textContent = "ログインしていません。ログインページからログインしてください。";
+                    // 3秒タイマー（setTimeout）を削除（コメントアウト）します
+                    /*
                     setTimeout(() => {
                         const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
                         window.location.href = window.location.origin + repoPath + '/login.html';
                     }, 3000);
+                    */
+                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                 }
             });
 

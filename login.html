@@ -36,7 +36,7 @@
 </head>
 <body class="bg-black text-gray-200 font-sans">
 
-    <!-- 共通ヘッダー -->
+    <!-- 共通ヘッダー（変更なし） -->
     <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <!-- ロゴ -->
@@ -47,7 +47,6 @@
             </div>
             <!-- ナビゲーション（PC用） -->
             <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
-                <!-- Home と Members のリンク先を変更 -->
                 <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
                 <a href="login.html" class="text-white hover:text-brand-gold transition-colors duration-300">Members</a>
                 <a href="#" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
@@ -55,13 +54,11 @@
         </nav>
     </header>
 
-    <!-- メインコンテンツ -->
+    <!-- メインコンテンツ（変更なし） -->
     <main>
-        <!-- ログインフォーム用のセクション -->
         <section class="relative flex items-center justify-center py-20 md:py-32" style="min-height: calc(100vh - 158px);">
             
             <div class="container mx-auto px-6">
-                <!-- ログインカード -->
                 <div class="max-w-md mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 fade-in is-visible">
                     
                     <h2 class="text-3xl font-serif-jp text-center mb-8">
@@ -70,9 +67,6 @@
                         </span>
                     </h2>
 
-                    <!-- 
-                        JavaScriptで操作するため、formタグに id="login-form" を追加します
-                    -->
                     <form id="login-form" action="#" method="POST" class="space-y-6">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-300">
@@ -83,7 +77,6 @@
                                     class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
                             </div>
                         </div>
-
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-300">
                                 パスワード
@@ -93,21 +86,15 @@
                                     class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
                             </div>
                         </div>
-
-                        <!-- 
-                            JavaScriptでエラーメッセージを表示するため、id="error-message" を持つ p タグを追加します
-                        -->
-                        <div class="h-5"> <!-- エラーメッセージ用の高さを確保 -->
+                        <div class="h-5">
+                            <!-- メッセージ表示エリア -->
                             <p id="error-message" class="text-sm text-red-400 text-center"></p>
                         </div>
-
-
-                        <div class="text-right text-sm -mt-2"> <!-- マージン調整 -->
+                        <div class="text-right text-sm -mt-2">
                             <a href="#" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
                                 パスワードをお忘れですか？
                             </a>
                         </div>
-
                         <div>
                             <button type="submit"
                                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
@@ -115,41 +102,112 @@
                             </button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- 共通フッター -->
+    <!-- 共通フッター（変更なし） -->
     <footer class="py-16 bg-black border-t border-gray-800">
         <div class="container mx-auto px-6 text-center text-gray-400">
-            <!-- ロゴ -->
             <div class="text-2xl font-serif-jp font-bold mb-4">
                 <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
                     ClubTake
                 </span>
             </div>
-            <!-- 住所など -->
             <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
             <p class="text-sm">TEL: 03-XXXX-XXXX</p>
-            <!-- フッターナビ -->
             <div class="flex justify-center space-x-6 my-6 text-sm">
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
             </div>
-            <!-- コピーライト -->
             <p class="text-xs text-gray-500 mt-8">
                 &copy; 2025 ClubTake. All Rights Reserved.
             </p>
         </div>
     </footer>
 
-    <!-- アニメーションのコードを外部ファイル(js/main.js)から読み込みます -->
+    <!-- アニメーション用の js/main.js （変更なし） -->
     <script src="js/main.js" defer></script>
     
-    <!-- ここを追加: ログイン機能用のJSファイルを読み込みます -->
-    <script src="js/login.js" defer></script>
+    <!-- ▼▼▼ここからが変更点▼▼▼ -->
+    
+    <!-- 
+      古い login.js の代わりに、新しい login-firebase.js を読み込むように変更 
+      (このファイルはステップ2で作成します)
+    -->
+    <!-- <script src="js/login.js" defer></script> -->
+
+    <!-- Firebaseの機能（ライブラリ）を読み込むためのコード -->
+    <script type="module">
+        // Firebaseの基本的な機能（App）を読み込みます
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Firebaseのログイン機能（Auth）を読み込みます
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // （重要）これらの変数は、サイトの環境から自動で提供されます
+        // ユーザーが自分で設定する必要はありません
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const firebaseConfig = JSON.parse(firebaseConfigStr);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        try {
+            // Firebaseを初期化します
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            
+            // ログイン状態をブラウザに保存するように設定
+            await setPersistence(auth, browserLocalPersistence);
+
+            // 自動でログイン処理を行います
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            // ログイン状態を監視します
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // ログイン成功！ 
+                    // user オブジェクトを他のスクリプトで使えるようにグローバルに保存します
+                    window.firebaseApp = app;
+                    window.firebaseAuth = auth;
+                    window.firebaseUser = user;
+                    
+                    // 準備ができたので、新しいログインスクリプトを読み込みます
+                    // ただし、まだ読み込まれていなければ
+                    if (!document.querySelector('script[src="js/login-firebase.js"]')) {
+                        loadLoginScript();
+                    }
+
+                } else {
+                    // ログイン失敗...
+                    console.log("Firebase anonymous auth failed.");
+                    window.firebaseUser = null;
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            // エラーメッセージを画面に表示することもできます
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.textContent = 'システムの初期化に失敗しました。';
+            }
+        }
+
+        // Firebaseの準備ができてから、ログイン機能のスクリプトを読み込む関数
+        function loadLoginScript() {
+            const script = document.createElement('script');
+            script.src = 'js/login-firebase.js'; // これから作るファイル
+            script.type = 'module'; // moduleとして読み込む
+            document.body.appendChild(script);
+        }
+
+    </script>
+    <!-- ▲▲▲ここまでが変更点▲▲▲ -->
 
 </body>
 </html>

@@ -70,7 +70,6 @@
                 <div id="page-error-message" class="max-w-lg mx-auto text-center text-red-400 text-lg mb-8"></div>
 
                 <!-- 新規メンバー追加フォーム -->
-                <!-- ▼▼▼変更点▼▼▼ style="display: none;" を削除し、最初から表示する -->
                 <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12">
                     
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
@@ -139,19 +138,27 @@
         // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Firebaseのログイン機能（Auth）を読み込みます
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // Firebaseのデータベース機能（Firestore）を読み込みます
         import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // デバッグ用のログを有効にします
         setLogLevel('Debug');
         
-        // （重要）これらの変数は、サイトの環境から自動で提供されます
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        const firebaseConfig = JSON.parse(firebaseConfigStr);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // あなたがFirebaseから取得した「本物の」設定情報をここに貼り付けました
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
 
+        // （注意）appId は、Firebase Config の appId を使うように変更します
+        const appId = firebaseConfig.appId; 
+        
         // グローバル変数として宣言
         let app, auth, db, currentUserId, currentUserToken;
         
@@ -167,18 +174,11 @@
             await setPersistence(auth, browserLocalPersistence);
 
             // 自動でログイン処理を行います（匿名ログイン）
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-                await signInAnonymously(auth); // 匿名でもログインし、DB操作を許可
-            }
+            await signInAnonymously(auth); // 匿名でもログインし、DB操作を許可
             
             // ログイン状態を監視します
             onAuthStateChanged(auth, async (user) => {
                 
-                // ▼▼▼変更点▼▼▼
-                // ユーザーがいれば（匿名でも）、管理者権限チェックを「行わず」に
-                // 強制的にフォームの機能を有効にします。
                 if (user) {
                     console.log("セットアップページ：ユーザーを認識しました:", user.uid);
                     currentUserId = user.uid; // 匿名ユーザーのIDでも、DB操作は可能
@@ -192,12 +192,33 @@
                     console.log("セットアップページ：匿名ユーザーの取得に失敗しました。");
                     if(pageError) pageError.textContent = "初期化に失敗しました。ページを再読み込みしてください。";
                 }
-                // ▲▲▲変更点▲▲▲
             });
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
-            if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
+            // エラーコードをチェックして、より具体的なメッセージを出す
+            if (error.code === 'auth/configuration-not-found') {
+                if(pageError) {
+                    // ユーザーに具体的な修正手順をHTMLで表示します
+                    pageError.innerHTML = `
+                        <p class="text-lg">設定エラー (auth/configuration-not-found)</p>
+                        <p class="text-base font-normal mt-2">
+                            Firebase側で「<strong class="text-yellow-400">匿名ログイン</strong>」が有効になっていません。
+                        </p>
+                        <p class="text-sm font-normal mt-4 text-left">
+                            <strong>修正方法:</strong><br>
+                            1. Firebaseの管理画面を開きます。<br>
+                            2. 「構築」 → 「<strong>Authentication</strong>」 に進みます。<br>
+                            3. 「<strong>Sign-in method</strong>」 タブをクリックします。<br>
+                            4. 「<strong>匿名</strong>」 (Anonymous) をクリックします。<br>
+                            5. 「<strong>有効にする</strong>」スイッチをONにして保存します。<br>
+                            6. 1〜2分待ってから、このページを<strong class="text-yellow-400">強制再読み込み (Ctrl + Shift + R)</strong> してください。
+                        </p>
+                    `;
+                }
+            } else {
+                 if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
+            }
         }
 
         // --- ページの機能を設定する関数 ---
@@ -249,7 +270,7 @@
                     try {
                         // 1. 一時的なアプリと認証インスタンスを作成
                         const tempAppName = 'temp-app-for-creation-' + Date.now();
-                        const tempApp = initializeApp(firebaseConfig, tempAppName);
+                        const tempApp = initializeApp(firebaseConfig, tempAppName); // ★本物のConfigを使う
                         const tempAuth = getAuth(tempApp);
 
                         // 2. 一時認証でユーザーを作成

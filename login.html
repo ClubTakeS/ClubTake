@@ -174,8 +174,8 @@
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
-            // ★★★変更★★★ 自動で「匿名」ログイン処理を行います
-            await signInAnonymously(auth);
+            // ★★★変更★★★ 自動で「匿名」ログイン処理を「行わない」ようにします
+            // await signInAnonymously(auth); // ← この行をコメントアウト（または削除）
 
             // ログイン状態を監視します
             onAuthStateChanged(auth, (user) => {

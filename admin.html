@@ -38,7 +38,7 @@
 
     <!-- 共通ヘッダー（変更なし） -->
     <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <nav class="container mx.auto px-6 py-4 flex justify-between items-center">
             <!-- ロゴ -->
             <div class="text-2xl font-serif-jp font-bold">
                 <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
@@ -63,16 +63,15 @@
                 <!-- ページタイトル -->
                 <h1 class="text-3xl md:text-4xl font-serif-jp mb-12 text-center">
                     <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                        メンバー管理
+                        管理ダッシュボード
                     </span>
                 </h1>
                 
                 <div id="page-error-message" class="max-w-4xl mx-auto text-center text-red-400 text-lg mb-8"></div>
                 
-                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（メンバー一覧の追加） ▼▼▼▼▼▼▼▼▼▼ -->
                 
-                <!-- メンバー一覧表示エリア -->
-                <div id="member-list-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;"> <!-- 初期状態は非表示 -->
+                <!-- メンバー一覧表示エリア (変更なし) -->
+                <div id="member-list-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
                         メンバー一覧
                     </h2>
@@ -93,11 +92,76 @@
                     </div>
                 </div>
 
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせ投稿フォームの追加） ▼▼▼▼▼▼▼▼▼▼ -->
+                
+                <!-- お知らせ投稿セクション -->
+                <div id="announcement-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
+                    <h2 class="text-2xl font-serif-jp text-center mb-8">
+                        お知らせ投稿
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        
+                        <!-- フォーム1: メンバー専用 -->
+                        <div class="space-y-6">
+                            <h3 class="text-xl font-serif-jp text-brand-gold">メンバー専用 お知らせ</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="member-title" class="block text-sm font-medium text-gray-300">タイトル</label>
+                                    <input id="member-title" type="text" required class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                                </div>
+                                <div>
+                                    <label for="member-content" class="block text-sm font-medium text-gray-300">内容</label>
+                                    <textarea id="member-content" rows="4" required class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold"></textarea>
+                                </div>
+                                <div class="h-5">
+                                    <p id="member-message" class="text-sm text-green-400 text-center"></p>
+                                </div>
+                                <div>
+                                    <button id="post-member-button" type="button" class="w-full justify-center py-3 px-4 border border-brand-gold rounded-lg shadow-sm text-base font-medium text-brand-gold bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
+                                        メンバー専用に投稿
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- フォーム2: 一般公開用 -->
+                        <div class="space-y-6">
+                            <h3 class="text-xl font-serif-jp text-brand-gold-light">一般公開用 お知らせ</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="public-title" class="block text-sm font-medium text-gray-300">タイトル</label>
+                                    <input id="public-title" type="text" required class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                                </div>
+                                <div>
+                                    <label for="public-category" class="block text-sm font-medium text-gray-300">カテゴリ</label>
+                                    <select id="public-category" required class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                                        <option value="お知らせ">お知らせ</option>
+                                        <option value="催事">催事</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="public-content" class="block text-sm font-medium text-gray-300">内容</label>
+                                    <textarea id="public-content" rows="4" required class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold"></textarea>
+                                </div>
+                                <div class="h-5">
+                                    <p id="public-message" class="text-sm text-green-400 text-center"></p>
+                                </div>
+                                <div>
+                                    <button id="post-public-button" type="button" class="w-full justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
+                                        一般公開で投稿
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
                 <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
 
 
-                <!-- 新規メンバー追加フォーム -->
-                <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;"> <!-- 初期状態は非表示 -->
+                <!-- 新規メンバー追加フォーム (変更なし) -->
+                <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;">
                     
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
                         新規メンバー登録
@@ -153,7 +217,7 @@
 
     <!-- 共通フッター（変更なし） -->
     <footer class="py-16 bg-black border-t border-gray-800">
-        <div class="container mx-auto px-6 text-center text-gray-400">
+        <div class="container mx.auto px-6 text-center text-gray-400">
             <p class="text-xs text-gray-500 mt-8">
                 &copy; 2025 ClubTake. All Rights Reserved. [Admin Mode]
             </p>
@@ -167,9 +231,9 @@
         // Firebaseのログイン機能（Auth）を読み込みます
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点（onValue, update をインポート） ▼▼▼▼▼▼▼▼▼▼
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点（push, serverTimestamp をインポート） ▼▼▼▼▼▼▼▼▼▼
         // Realtime Database の機能を読み込みます
-        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
         // あなたの「本物の」設定情報を貼り付けます
@@ -220,15 +284,17 @@
                     if (snapshot.exists() && snapshot.val().isAdmin === true) {
                         // 管理者権限あり
                         console.log("管理者権限を確認しました。");
-                        // フォームと「メンバー一覧」の両方を表示
+                        // 全ての管理セクションを表示
                         document.getElementById('admin-content').style.display = 'block';
-                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                         document.getElementById('member-list-section').style.display = 'block';
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                        document.getElementById('announcement-section').style.display = 'block';
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+                        
                         // 登録ボタンやログアウトボタンの機能を有効にします
                         setupAdminPage();
                         // メンバー一覧の読み込みを開始します
                         loadAndDisplayMembers();
-                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                     } else {
                         // 管理者権限なし
                         console.log("管理者権限がありません。");
@@ -246,87 +312,38 @@
             if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
         }
 
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点（メンバー一覧を読み込む関数） ▼▼▼▼▼▼▼▼▼▼
-        /**
-         * データベースから全メンバーの情報を読み込み、一覧テーブルを表示する関数
-         */
+        
+        /* ▼▼▼▼▼▼▼▼▼▼ 変更点（メンバー一覧を読み込む関数） ▼▼▼▼▼▼▼▼▼▼ */
+        // （このセクションは変更なし）
+        /* ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ */
         function loadAndDisplayMembers() {
             const usersRef = ref(db, 'user_roles');
             const listContainer = document.getElementById('member-list-container');
             const loadingMessage = document.getElementById('list-loading-message');
 
-            // onValue を使って、データベースの変更をリアルタイムで監視します
             onValue(usersRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const users = snapshot.val();
-                    
-                    // 読み込みメッセージを非表示に
                     loadingMessage.style.display = 'none';
+                    let tableHtml = `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-900"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">メールアドレス</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">権限</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">操作</th></tr></thead><tbody class="bg-black divide-y divide-gray-800">`;
                     
-                    // テーブルのHTMLを組み立て
-                    let tableHtml = `
-                        <table class="min-w-full divide-y divide-gray-700">
-                            <thead class="bg-gray-900">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">メールアドレス</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">権限</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-black divide-y divide-gray-800">
-                    `;
-                    
-                    // ユーザー全員分の行を作成
                     Object.entries(users).forEach(([userId, userData]) => {
-                        
-                        // 自分がログイン中の管理者の場合は、権限を変更できないようにする
                         const isCurrentUser = (userId === currentUserId);
-                        
-                        tableHtml += `
-                            <tr class="hover:bg-gray-900 transition-colors duration-200">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    ${userData.isAdmin 
-                                        ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-900 text-yellow-200">管理者</span>' 
-                                        : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'
-                                    }
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        `;
-                        
-                        // ボタンの作成
+                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td><td class="px-6 py-4 whitespace-nowrap text-sm">${userData.isAdmin ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-900 text-yellow-200">管理者</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium">`;
                         if (isCurrentUser) {
-                            // 自分自身の場合
                             tableHtml += `<span class="text-xs text-gray-500">（自分）</span>`;
                         } else if (userData.isAdmin) {
-                            // 他の管理者の場合 → 「一般に降格」ボタン
-                            tableHtml += `
-                                <button type="button" class="role-change-button text-gray-400 hover:text-white transition-colors duration-300"
-                                    data-user-id="${userId}" data-new-role="false">
-                                    一般に降格
-                                </button>
-                            `;
+                            tableHtml += `<button type="button" class="role-change-button text-gray-400 hover:text-white transition-colors duration-300" data-user-id="${userId}" data-new-role="false">一般に降格</button>`;
                         } else {
-                            // 一般メンバーの場合 → 「管理者に昇格」ボタン
-                             tableHtml += `
-                                <button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300"
-                                    data-user-id="${userId}" data-new-role="true">
-                                    管理者に昇格
-                                </button>
-                            `;
+                             tableHtml += `<button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300" data-user-id="${userId}" data-new-role="true">管理者に昇格</button>`;
                         }
-                        
                         tableHtml += `</td></tr>`;
                     });
 
                     tableHtml += `</tbody></table>`;
                     listContainer.innerHTML = tableHtml;
-
-                    // 作成したボタンにクリックイベントを設定
                     addEventListenersToButtons();
-
                 } else {
-                    // メンバーが一人もいない場合
                     loadingMessage.textContent = 'まだメンバーは登録されていません。';
                 }
             }, (error) => {
@@ -335,24 +352,16 @@
             });
         }
         
-        /**
-         * 権限変更ボタンにクリックイベントを設定する関数
-         */
         function addEventListenersToButtons() {
             const listMessage = document.getElementById('list-message');
-            
             document.querySelectorAll('.role-change-button').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     const userId = event.target.dataset.userId;
-                    const newRole = (event.target.dataset.newRole === 'true'); // 文字列をBooleanに変換
-                    
+                    const newRole = (event.target.dataset.newRole === 'true');
                     listMessage.textContent = '権限を変更中...';
                     listMessage.className = 'text-sm text-yellow-400 text-center';
-
                     try {
-                        // データベースの権限を更新
                         await updateUserRole(userId, newRole);
-                        
                         listMessage.textContent = `権限を「${newRole ? '管理者' : '一般'}」に変更しました。`;
                         listMessage.className = 'text-sm text-green-400 text-center';
                     } catch (error) {
@@ -360,26 +369,17 @@
                         listMessage.textContent = '権限の変更に失敗しました。';
                         listMessage.className = 'text-sm text-red-400 text-center';
                     }
-                    
-                    // 3秒後にメッセージを消す
                     setTimeout(() => { listMessage.textContent = ''; }, 3000);
                 });
             });
         }
         
-        /**
-         * ユーザーの権限（isAdmin）をデータベースで更新する関数
-         * @param {string} userId - 対象のユーザーID
-         * @param {boolean} newRole - 新しい権限 (true:管理者, false:一般)
-         */
         async function updateUserRole(userId, newRole) {
             const userRoleRef = ref(db, `user_roles/${userId}`);
             await update(userRoleRef, {
                 isAdmin: newRole
             });
         }
-        
-        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
 
         // --- ページの機能を設定する関数 ---
@@ -400,6 +400,91 @@
                     }
                 });
             }
+
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせ投稿ボタンの機能を追加） ▼▼▼▼▼▼▼▼▼▼
+            
+            // メンバー専用お知らせ 投稿ボタン
+            const postMemberButton = document.getElementById('post-member-button');
+            const memberMessage = document.getElementById('member-message');
+            
+            postMemberButton.addEventListener('click', async () => {
+                const title = document.getElementById('member-title').value;
+                const content = document.getElementById('member-content').value;
+
+                if (!title || !content) {
+                    memberMessage.textContent = 'タイトルと内容を入力してください。';
+                    memberMessage.className = 'text-sm text-red-400 text-center';
+                    return;
+                }
+                
+                memberMessage.textContent = '投稿中...';
+                memberMessage.className = 'text-sm text-yellow-400 text-center';
+
+                try {
+                    // 'member_announcements' パスに新しいデータを追加 (push)
+                    const announcementsRef = ref(db, 'member_announcements');
+                    await push(announcementsRef, {
+                        title: title,
+                        content: content,
+                        createdAt: serverTimestamp() // Firebaseサーバーの時刻を保存
+                    });
+                    
+                    memberMessage.textContent = 'メンバー専用に投稿しました。';
+                    memberMessage.className = 'text-sm text-green-400 text-center';
+                    document.getElementById('member-title').value = '';
+                    document.getElementById('member-content').value = '';
+                
+                } catch (error) {
+                    console.error("メンバー専用お知らせの投稿失敗:", error);
+                    memberMessage.textContent = '投稿に失敗しました。';
+                    memberMessage.className = 'text-sm text-red-400 text-center';
+                }
+                setTimeout(() => { memberMessage.textContent = ''; }, 3000);
+            });
+            
+            // 一般公開用お知らせ 投稿ボタン
+            const postPublicButton = document.getElementById('post-public-button');
+            const publicMessage = document.getElementById('public-message');
+            
+            postPublicButton.addEventListener('click', async () => {
+                const title = document.getElementById('public-title').value;
+                const content = document.getElementById('public-content').value;
+                const category = document.getElementById('public-category').value;
+
+                if (!title || !content || !category) {
+                    publicMessage.textContent = 'すべての項目を入力してください。';
+                    publicMessage.className = 'text-sm text-red-400 text-center';
+                    return;
+                }
+                
+                publicMessage.textContent = '投稿中...';
+                publicMessage.className = 'text-sm text-yellow-400 text-center';
+                
+                try {
+                    // 'public_news' パスに新しいデータを追加 (push)
+                    const newsRef = ref(db, 'public_news');
+                    await push(newsRef, {
+                        title: title,
+                        content: content,
+                        category: category,
+                        createdAt: serverTimestamp() // Firebaseサーバーの時刻を保存
+                    });
+                    
+                    publicMessage.textContent = '一般公開で投稿しました。';
+                    publicMessage.className = 'text-sm text-green-400 text-center';
+                    document.getElementById('public-title').value = '';
+                    document.getElementById('public-content').value = '';
+                
+                } catch (error) {
+                    console.error("一般公開お知らせの投稿失敗:", error);
+                    publicMessage.textContent = '投稿に失敗しました。';
+                    publicMessage.className = 'text-sm text-red-400 text-center';
+                }
+                setTimeout(() => { publicMessage.textContent = ''; }, 3000);
+            });
+            
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+            
 
             // 新規メンバー登録ボタンの機能（変更なし）
             const createButton = document.getElementById('create-user-button');

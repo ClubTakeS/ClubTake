@@ -75,7 +75,12 @@ if (loginForm) {
 
         } catch (error) {
             // ログインに失敗した場合
-            console.error('ログイン失敗:', error.code);
+            
+            // ▼▼▼▼▼▼▼▼▼▼ ここが修正点です ▼▼▼▼▼▼▼▼▼▼
+            // error.code だけでなく、error オブジェクト全体を記録します
+            console.error('ログイン失敗:', error); 
+            // ▲▲▲▲▲▲▲▲▲▲ ここが修正点です ▲▲▲▲▲▲▲▲▲▲
+            
             if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
                 errorMessage.textContent = 'メールアドレスまたはパスワードが正しくありません。';
             } else {

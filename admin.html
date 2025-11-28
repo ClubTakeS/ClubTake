@@ -67,9 +67,7 @@
                     </span>
                 </h1>
                 
-                <!-- ▼▼▼変更点▼▼▼ ページ全体のエラーメッセージエリアを追加 -->
                 <div id="page-error-message" class="max-w-lg mx-auto text-center text-red-400 text-lg mb-8"></div>
-                <!-- ▲▲▲変更点▲▲▲ -->
 
                 <!-- 新規メンバー追加フォーム -->
                 <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;"> <!-- 初期状態は非表示 -->
@@ -135,67 +133,95 @@
         </div>
     </footer>
 
-    <!-- Firebaseの機能を読み込む（login.html と同じもの） -->
+    <!-- Firebaseの機能を読み込む -->
     <script type="module">
         // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Firebaseのログイン機能（Auth）を読み込みます
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Firebaseのデータベース機能（Firestore）を読み込みます
-        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // デバッグ用のログを有効にします
-        setLogLevel('Debug');
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+        // Firestore の代わりに Realtime Database の機能を読み込みます
+        // import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+
+        // setLogLevel('Debug'); // ログは削除
+
+        // あなたの「本物の」設定情報を貼り付けます
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
         
-        // （重要）これらの変数は、サイトの環境から自動で提供されます
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        const firebaseConfig = JSON.parse(firebaseConfigStr);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Realtime Database の URL を config に追加します
+        firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
+
+        // appId は config から取得します
+        const appId = firebaseConfig.appId;
+        // （`initialAuthToken` はもう使いません）
 
         // グローバル変数として宣言
         let app, auth, db, currentUserId, currentUserToken;
         
-        // ▼▼▼変更点▼▼▼ エラーメッセージ用の要素を取得
         const pageError = document.getElementById('page-error-message');
 
         try {
             // Firebaseを初期化します
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            db = getFirestore(app);
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+            // Realtime Database を初期化します
+            db = getDatabase(app);
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
-            // 自動でログイン処理を行います
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            }
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+            // 自動で「匿名」ログイン処理を行います
+            // （`initialAuthToken` はもう使いません）
+            await signInAnonymously(auth);
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             
             // ログイン状態を監視します
             onAuthStateChanged(auth, async (user) => {
-                if (user) {
+                
+                // ★★★
+                // このページは管理者専用なので、「匿名ユーザー」は弾きます
+                // ★★★
+                if (user && !user.isAnonymous) {
                     // ログイン成功
                     console.log("管理者ページ：ユーザーを認識しました:", user.email);
                     currentUserId = user.uid;
-                    currentUserToken = await user.getIdToken(); // 現在のユーザートークンを取得
+                    currentUserToken = await user.getIdToken(); 
 
                     // このユーザーが本当に管理者か、再度DBに確認します（セキュリティのため）
-                    const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, currentUserId);
-                    const roleDoc = await getDoc(roleDocRef);
+                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                    // Realtime Database に問い合わせます
+                    // const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, currentUserId);
+                    // const roleDoc = await getDoc(roleDocRef);
+                    
+                    const roleRef = ref(db, `user_roles/${currentUserId}`);
+                    const snapshot = await get(roleRef);
 
-                    if (roleDoc.exists() && roleDoc.data().isAdmin === true) {
+                    // if (roleDoc.exists() && roleDoc.data().isAdmin === true) {
+                    if (snapshot.exists() && snapshot.val().isAdmin === true) {
+                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+
                         // 管理者権限あり
                         console.log("管理者権限を確認しました。");
-                        // ▼▼▼変更点▼▼▼ フォームを表示
                         document.getElementById('admin-content').style.display = 'block';
                         // 登録ボタンやログアウトボタンの機能を有効にします
                         setupAdminPage();
                     } else {
                         // 管理者権限なし
                         console.log("管理者権限がありません。ログインページに戻ります。");
-                        // ▼▼▼変更点▼▼▼ alertを削除し、エラーメッセージを表示してリダイレクト
                         if(pageError) pageError.textContent = "アクセス権限がありません。3秒後にログインページに戻ります。";
                         setTimeout(() => {
                             const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
@@ -204,9 +230,8 @@
                     }
 
                 } else {
-                    // ログインしていない（またはセッションが切れた）
+                    // ログインしていない（または匿名ユーザー）
                     console.log("管理者ページ：ユーザーが認識できません。ログインページに戻ります。");
-                    // ▼▼▼変更点▼▼▼ alertを削除し、エラーメッセージを表示してリダイレクト
                     if(pageError) pageError.textContent = "ログインしていません。3秒後にログインページに戻ります。";
                     setTimeout(() => {
                         const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
@@ -217,9 +242,7 @@
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
-            // ▼▼▼変更点▼▼▼ alertを削除し、エラーメッセージを表示。リダイレクトを削除
             if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
-            // window.location.href = 'login.html'; // ループを防ぐために削除
         }
 
         // --- ページの機能を設定する関数 ---
@@ -233,7 +256,6 @@
                     try {
                         await signOut(auth);
                         console.log("ログアウトしました。");
-                        // ▼▼▼変更点▼▼▼ リダイレクト先を絶対パスに変更
                         const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
                         window.location.href = window.location.origin + repoPath + '/index.html'; // トップページに戻る
                     } catch (error) {
@@ -269,13 +291,7 @@
                     messageEl.className = 'text-sm text-yellow-400 text-center';
 
                     try {
-                        // Firebase Auth に新しいユーザーを作成する
-                        // ★重要★
-                        // createUserWithEmailAndPassword は自動的に「作成したユーザー」でログインしてしまいます。
-                        // これを防ぐため、一度「別の（一時的な）認証インスタンス」を使います。
-                        
-                        // 1. メインの認証とは別に、一時的なアプリと認証インスタンスを作成
-                        // ▼▼▼変更点▼▼▼ 固有のアプリ名を指定
+                        // 1. 一時的なアプリと認証インスタンスを作成
                         const tempAppName = 'temp-app-for-creation-' + Date.now();
                         const tempApp = initializeApp(firebaseConfig, tempAppName);
                         const tempAuth = getAuth(tempApp);
@@ -285,20 +301,25 @@
                         const newUserId = userCredential.user.uid;
                         console.log('Authユーザー作成成功:', newUserId);
                         
-                        // 3. メインのDBインスタンスを使って、役割（Role）をデータベースに保存
-                        const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, newUserId);
-                        await setDoc(roleDocRef, {
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                        // 3. メインのDBインスタンス (Realtime Database) を使って、役割（Role）をデータベースに保存
+                        // const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, newUserId);
+                        // await setDoc(roleDocRef, {
+                        //     email: email,
+                        //     isAdmin: isAdmin // チェックボックスの状態を保存
+                        // });
+                        
+                        const roleRef = ref(db, `user_roles/${newUserId}`);
+                        await set(roleRef, {
                             email: email,
-                            isAdmin: isAdmin // チェックボックスの状態を保存
+                            isAdmin: isAdmin
                         });
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
-                        console.log('役割データベース(Firestore)への保存成功。');
+                        console.log('役割データベース(Realtime DB)への保存成功。');
 
                         // 4. 一時認証インスタンスをログアウト（必須）
                         await signOut(tempAuth);
-                        // ▼▼▼変更点▼▼▼ 一時アプリを削除（リソースリーク防止）
-                        // ※ deleteApp() はv9モジュラーSDKでは明示的にインポートが必要ですが、
-                        // この環境では利用できない可能性があるため、signOut()のみで対応します。
                         
                         // 成功メッセージ
                         messageEl.textContent = `登録成功: ${email} (${isAdmin ? '管理者' : '一般メンバー'})`;
@@ -317,7 +338,13 @@
                         } else if (error.code === 'auth/weak-password') {
                             messageEl.textContent = 'パスワードは6文字以上で入力してください。';
                         } else {
-                            messageEl.textContent = '登録に失敗しました。';
+                            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                            if (error.code === 'PERMISSION_DENIED') {
+                                messageEl.textContent = 'データベースへの書き込み権限がありません。';
+                            } else {
+                                messageEl.textContent = '登録に失敗しました。';
+                            }
+                            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                         }
                         messageEl.className = 'text-sm text-red-400 text-center';
                     }

@@ -4,16 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClubTake - ログイン</title>
+    
+    <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
     <!-- Tailwind CSS を読み込みます -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- CSSファイルを読み込みます -->
-    <link rel="stylesheet" href="css/style.css">
-
+    <!-- Tailwind CSSのカスタム設定（CDNのすぐ下に移動しました） -->
     <script>
         // Tailwind CSSのカスタム設定
         tailwind.config = {
@@ -33,6 +29,16 @@
             }
         }
     </script>
+    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+
+    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルを読み込みます -->
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body class="bg-black text-gray-200 font-sans">
 
@@ -174,8 +180,8 @@
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
-            // ★★★変更★★★ 自動で「匿名」ログイン処理を「行わない」ようにします
-            // await signInAnonymously(auth); // ← この行をコメントアウト（または削除）
+            // ★★★変更★★★ 自動で「匿名」ログイン処理を行「わない」ようにします
+            // await signInAnonymously(auth); // ← この行はコメントアウト（または削除）しておきます
 
             // ログイン状態を監視します
             onAuthStateChanged(auth, (user) => {
@@ -195,7 +201,10 @@
 
                 } else {
                     // ログイン失敗...
-                    console.log("Firebase anonymous auth failed.");
+                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                    // このログは紛らわしいので削除（コメントアウト）します
+                    // console.log("Firebase anonymous auth failed.");
+                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                     window.firebaseUser = null;
                 }
             });
@@ -211,7 +220,10 @@
         // ログイン機能のスクリプトを読み込む関数
         function loadLoginScript() {
             const script = document.createElement('script');
-            script.src = 'js/login-firebase.js'; // (次のステップで修正します)
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点（キャッシュ対策） ▼▼▼▼▼▼▼▼▼▼
+            // ?v=${Date.now()} を追加して、常に最新のファイルを読み込むようにします
+            script.src = `js/login-firebase.js?v=${Date.now()}`; 
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             script.type = 'module'; // moduleとして読み込む
             document.body.appendChild(script);
         }

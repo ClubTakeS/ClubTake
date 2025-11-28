@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubTake - ログイン</title>
+    <!-- Tailwind CSS を読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルを読み込みます -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        // Tailwind CSSのカスタム設定
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif-jp': ['"Noto Serif JP"', 'serif']
+                    },
+                    colors: {
+                        // ワイヤーフレームで指定したアクセント色（ゴールド）
+                        'brand-gold': '#C0A16B',
+                        'brand-gold-light': '#DBC18B', // 少し明るく
+                        'brand-gold-dark': '#A0814B'  // 少し暗く
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-gray-200 font-sans">
+
+    <!-- 共通ヘッダー -->
+    <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- ロゴ -->
+            <div class="text-2xl font-serif-jp font-bold">
+                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                    ClubTake
+                </span>
+            </div>
+            <!-- ナビゲーション（PC用） -->
+            <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
+                <!-- Home と Members のリンク先を変更 -->
+                <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
+                <a href="login.html" class="text-white hover:text-brand-gold transition-colors duration-300">Members</a>
+                <a href="#" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+        <!-- ログインフォーム用のセクション -->
+        <section class="relative flex items-center justify-center py-20 md:py-32" style="min-height: calc(100vh - 158px);">
+            
+            <div class="container mx-auto px-6">
+                <!-- ログインカード -->
+                <div class="max-w-md mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 fade-in is-visible">
+                    
+                    <h2 class="text-3xl font-serif-jp text-center mb-8">
+                        <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                            メンバーズ ログイン
+                        </span>
+                    </h2>
+
+                    <!-- 
+                        JavaScriptで操作するため、formタグに id="login-form" を追加します
+                    -->
+                    <form id="login-form" action="#" method="POST" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300">
+                                メールアドレス
+                            </label>
+                            <div class="mt-1">
+                                <input id="email" name="email" type="email" autocomplete="email" required
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-300">
+                                パスワード
+                            </label>
+                            <div class="mt-1">
+                                <input id="password" name="password" type="password" autocomplete="current-password" required
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+
+                        <!-- 
+                            JavaScriptでエラーメッセージを表示するため、id="error-message" を持つ p タグを追加します
+                        -->
+                        <div class="h-5"> <!-- エラーメッセージ用の高さを確保 -->
+                            <p id="error-message" class="text-sm text-red-400 text-center"></p>
+                        </div>
+
+
+                        <div class="text-right text-sm -mt-2"> <!-- マージン調整 -->
+                            <a href="#" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
+                                パスワードをお忘れですか？
+                            </a>
+                        </div>
+
+                        <div>
+                            <button type="submit"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
+                                ログイン
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 共通フッター -->
+    <footer class="py-16 bg-black border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <!-- ロゴ -->
+            <div class="text-2xl font-serif-jp font-bold mb-4">
+                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                    ClubTake
+                </span>
+            </div>
+            <!-- 住所など -->
+            <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
+            <p class="text-sm">TEL: 03-XXXX-XXXX</p>
+            <!-- フッターナビ -->
+            <div class="flex justify-center space-x-6 my-6 text-sm">
+                <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
+                <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
+            </div>
+            <!-- コピーライト -->
+            <p class="text-xs text-gray-500 mt-8">
+                &copy; 2025 ClubTake. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- アニメーションのコードを外部ファイル(js/main.js)から読み込みます -->
+    <script src="js/main.js" defer></script>
+    
+    <!-- ここを追加: ログイン機能用のJSファイルを読み込みます -->
+    <script src="js/login.js" defer></script>
+
+</body>
+</html>

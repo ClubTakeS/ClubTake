@@ -1,15 +1,21 @@
-// Firebaseの機能（Auth と Firestore）を読み込みます
-// （login.html で読み込んだものを、ここで改めてインポートします）
+// Firebaseの機能（Auth と Realtime Database）を読み込みます
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { doc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// ★★★変更★★★ Firestore の代わりに Realtime Database の機能を読み込みます
+// import { doc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-// デバッグ用のログを有効にします
-setLogLevel('Debug');
+
+// ★★★変更★★★ setLogLevel は database には無いので削除
+// setLogLevel('Debug');
 
 // login.html で準備ができたグローバル変数（auth や db）を取得します
 const auth = window.firebaseAuth;
 const db = window.firebaseDb;
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+// ★★★変更★★★ appId は db から取得します
+// const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const appId = db.app.options.appId;
+
 
 // ログインフォーム（login.htmlで id="login-form" を持つ要素）を探します
 const loginForm = document.getElementById('login-form');
@@ -41,13 +47,21 @@ if (loginForm) {
             console.log('ログイン成功:', user.email);
 
             // 次に、このユーザーが「管理者」かどうかをデータベースで確認します
-            // （注意：Firestoreのパスはセキュリティルールと一致させる必要があります）
             const userId = user.uid;
-            const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, userId);
             
-            const roleDoc = await getDoc(roleDocRef);
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+            // Firestore の代わりに Realtime Database に問い合わせます
+            // const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, userId);
+            // const roleDoc = await getDoc(roleDocRef);
+            
+            // Realtime Database のパスを指定 (admin-setup.html と合わせる)
+            const roleRef = ref(db, `user_roles/${userId}`);
+            const snapshot = await get(roleRef);
 
-            if (roleDoc.exists() && roleDoc.data().isAdmin === true) {
+            // if (roleDoc.exists() && roleDoc.data().isAdmin === true) {
+            if (snapshot.exists() && snapshot.val().isAdmin === true) {
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+
                 // もし「管理者(isAdmin: true)」だったら
                 console.log('管理者として認識しました。');
                 // 管理者専用ページに移動します（ステップ3で作成します）
@@ -62,7 +76,7 @@ if (loginForm) {
         } catch (error) {
             // ログインに失敗した場合
             console.error('ログイン失敗:', error.code);
-            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
                 errorMessage.textContent = 'メールアドレスまたはパスワードが正しくありません。';
             } else {
                 errorMessage.textContent = 'ログイン中にエラーが発生しました。';

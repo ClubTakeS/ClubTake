@@ -184,9 +184,9 @@
             await setPersistence(auth, browserLocalPersistence);
 
             // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
-            // 自動で「匿名」ログイン処理を行います
+            // 自動で「匿名」ログイン処理を行「わない」ように変更します
             // （`initialAuthToken` はもう使いません）
-            await signInAnonymously(auth);
+            // await signInAnonymously(auth); // ← この行をコメントアウト（または削除）します
             // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             
             // ログイン状態を監視します

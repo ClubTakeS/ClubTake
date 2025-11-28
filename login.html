@@ -132,10 +132,6 @@
     
     <!-- ▼▼▼ここからが変更点▼▼▼ -->
     
-    <!-- 
-      古い login.js の代わりに、新しい login-firebase.js を読み込むように変更 
-      (このファイルはステップ2で作成します)
-    -->
     <!-- <script src="js/login.js" defer></script> -->
 
     <!-- Firebaseの機能（ライブラリ）を読み込むためのコード -->
@@ -144,9 +140,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Firebaseのログイン機能（Auth）を読み込みます
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // ★★★追加★★★ Firebaseのデータベース機能（Firestore）を読み込みます
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         
         // （重要）これらの変数は、サイトの環境から自動で提供されます
-        // ユーザーが自分で設定する必要はありません
         const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
         const firebaseConfig = JSON.parse(firebaseConfigStr);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -156,6 +154,8 @@
             // Firebaseを初期化します
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
+            // ★★★追加★★★ データベースを初期化します
+            const db = getFirestore(app);
             
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
@@ -174,10 +174,10 @@
                     // user オブジェクトを他のスクリプトで使えるようにグローバルに保存します
                     window.firebaseApp = app;
                     window.firebaseAuth = auth;
+                    window.firebaseDb = db; // ★★★追加★★★ データベースも保存
                     window.firebaseUser = user;
                     
                     // 準備ができたので、新しいログインスクリプトを読み込みます
-                    // ただし、まだ読み込まれていなければ
                     if (!document.querySelector('script[src="js/login-firebase.js"]')) {
                         loadLoginScript();
                     }
@@ -191,14 +191,13 @@
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
-            // エラーメッセージを画面に表示することもできます
             const errorMessage = document.getElementById('error-message');
             if (errorMessage) {
                 errorMessage.textContent = 'システムの初期化に失敗しました。';
             }
         }
 
-        // Firebaseの準備ができてから、ログイン機能のスクリプトを読み込む関数
+        // ログイン機能のスクリプトを読み込む関数
         function loadLoginScript() {
             const script = document.createElement('script');
             script.src = 'js/login-firebase.js'; // これから作るファイル

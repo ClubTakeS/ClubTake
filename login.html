@@ -132,40 +132,48 @@
     
     <!-- ▼▼▼ここからが変更点▼▼▼ -->
     
-    <!-- <script src="js/login.js" defer></script> -->
-
     <!-- Firebaseの機能（ライブラリ）を読み込むためのコード -->
     <script type="module">
         // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Firebaseのログイン機能（Auth）を読み込みます
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // ★★★追加★★★ Firebaseのデータベース機能（Firestore）を読み込みます
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // （重要）これらの変数は、サイトの環境から自動で提供されます
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        const firebaseConfig = JSON.parse(firebaseConfigStr);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ★★★変更★★★ Firestore の代わりに Realtime Database の機能を読み込みます
+        // import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
+        
+        // ★★★変更★★★ あなたの「本物の」設定情報を貼り付けます
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
+        
+        // ★★★変更★★★ Realtime Database の URL を config に追加します
+        firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
+
+        // ★★★変更★★★ appId は config から取得します
+        const appId = firebaseConfig.appId;
+        // （`initialAuthToken` はもう使いません）
 
         try {
             // Firebaseを初期化します
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
-            // ★★★追加★★★ データベースを初期化します
-            const db = getFirestore(app);
+            // ★★★変更★★★ Realtime Database を初期化します
+            const db = getDatabase(app);
             
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
-            // 自動でログイン処理を行います
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-                await signInAnonymously(auth);
-            }
+            // ★★★変更★★★ 自動で「匿名」ログイン処理を行います
+            await signInAnonymously(auth);
 
             // ログイン状態を監視します
             onAuthStateChanged(auth, (user) => {
@@ -174,10 +182,11 @@
                     // user オブジェクトを他のスクリプトで使えるようにグローバルに保存します
                     window.firebaseApp = app;
                     window.firebaseAuth = auth;
-                    window.firebaseDb = db; // ★★★追加★★★ データベースも保存
+                    window.firebaseDb = db; // ★★★変更★★★ 新しいDBを保存
                     window.firebaseUser = user;
                     
-                    // 準備ができたので、新しいログインスクリプトを読み込みます
+                    // 準備ができたので、ログインスクリプトを読み込みます
+                    // (js/login-firebase.js はステップ2で修正します)
                     if (!document.querySelector('script[src="js/login-firebase.js"]')) {
                         loadLoginScript();
                     }
@@ -200,7 +209,7 @@
         // ログイン機能のスクリプトを読み込む関数
         function loadLoginScript() {
             const script = document.createElement('script');
-            script.src = 'js/login-firebase.js'; // これから作るファイル
+            script.src = 'js/login-firebase.js'; // (次のステップで修正します)
             script.type = 'module'; // moduleとして読み込む
             document.body.appendChild(script);
         }

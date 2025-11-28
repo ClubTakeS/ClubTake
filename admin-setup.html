@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubTake - 初回セットアップ</title>
+    <!-- Tailwind CSS を読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルを読み込みます -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        // Tailwind CSSのカスタム設定
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif-jp': ['"Noto Serif JP"', 'serif']
+                    },
+                    colors: {
+                        // ワイヤーフレームで指定したアクセント色（ゴールド）
+                        'brand-gold': '#C0A16B',
+                        'brand-gold-light': '#DBC18B', // 少し明るく
+                        'brand-gold-dark': '#A0814B'  // 少し暗く
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-gray-200 font-sans">
+
+    <!-- 共通ヘッダー -->
+    <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- ロゴ -->
+            <div class="text-2xl font-serif-jp font-bold">
+                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                    ClubTake [初回セットアップ]
+                </span>
+            </div>
+            <!-- ナビゲーション（PC用） -->
+            <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
+                <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
+                <!-- ログアウト機能は念のため残す -->
+                <a href="#" id="logout-button" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">ログアウト</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+        <section class="py-20 md:py-24" style="min-height: calc(100vh - 158px);">
+            
+            <div class="container mx-auto px-6">
+
+                <!-- ページタイトル -->
+                <h1 class="text-3xl md:text-4xl font-serif-jp mb-12 text-center">
+                    <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                        最初の管理者 登録
+                    </span>
+                </h1>
+                
+                <div id="page-error-message" class="max-w-lg mx-auto text-center text-red-400 text-lg mb-8"></div>
+
+                <!-- 新規メンバー追加フォーム -->
+                <!-- ▼▼▼変更点▼▼▼ style="display: none;" を削除し、最初から表示する -->
+                <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12">
+                    
+                    <h2 class="text-2xl font-serif-jp text-center mb-8">
+                        新規メンバー登録
+                    </h2>
+                    
+                    <div id="create-user-form" class="space-y-6">
+                        <div>
+                            <label for="new-email" class="block text-sm font-medium text-gray-300">
+                                新規メールアドレス
+                            </label>
+                            <div class="mt-1">
+                                <input id="new-email" name="new-email" type="email" required
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="new-password" class="block text-sm font-medium text-gray-300">
+                                新規パスワード
+                            </label>
+                            <div class="mt-1">
+                                <input id="new-password" name="new-password" type="password" required
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+
+                        <!-- チェックボックスで「管理者」か「一般メンバー」かを選べるようにします -->
+                        <div class="flex items-center">
+                            <input id="is-admin" name="is-admin" type="checkbox"
+                                class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-brand-gold focus:ring-brand-gold">
+                            <label for="is-admin" class="ml-3 block text-sm font-medium text-gray-300">
+                                管理者として登録する（必ずチェックしてください）
+                            </label>
+                        </div>
+
+                        <!-- メッセージ表示エリア -->
+                        <div class="h-5">
+                            <p id="message" class="text-sm text-green-400 text-center"></p>
+                        </div>
+
+                        <div>
+                            <button id="create-user-button" type="button"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
+                                登録実行
+                            </button>
+                        </div>
+                    </div> <!-- id="create-user-form" の終わり -->
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 共通フッター -->
+    <footer class="py-16 bg-black border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p class="text-xs text-gray-500 mt-8">
+                &copy; 2025 ClubTake. All Rights Reserved. [Setup Mode]
+            </p>
+        </div>
+    </footer>
+
+    <!-- Firebaseの機能を読み込む（admin.html と同じもの） -->
+    <script type="module">
+        // Firebaseの基本的な機能（App）を読み込みます
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Firebaseのログイン機能（Auth）を読み込みます
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Firebaseのデータベース機能（Firestore）を読み込みます
+        import { getFirestore, doc, getDoc, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // デバッグ用のログを有効にします
+        setLogLevel('Debug');
+        
+        // （重要）これらの変数は、サイトの環境から自動で提供されます
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const firebaseConfig = JSON.parse(firebaseConfigStr);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // グローバル変数として宣言
+        let app, auth, db, currentUserId, currentUserToken;
+        
+        const pageError = document.getElementById('page-error-message');
+
+        try {
+            // Firebaseを初期化します
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            // ログイン状態をブラウザに保存するように設定
+            await setPersistence(auth, browserLocalPersistence);
+
+            // 自動でログイン処理を行います（匿名ログイン）
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth); // 匿名でもログインし、DB操作を許可
+            }
+            
+            // ログイン状態を監視します
+            onAuthStateChanged(auth, async (user) => {
+                
+                // ▼▼▼変更点▼▼▼
+                // ユーザーがいれば（匿名でも）、管理者権限チェックを「行わず」に
+                // 強制的にフォームの機能を有効にします。
+                if (user) {
+                    console.log("セットアップページ：ユーザーを認識しました:", user.uid);
+                    currentUserId = user.uid; // 匿名ユーザーのIDでも、DB操作は可能
+                    
+                    console.log("管理者権限のチェックをスキップして、登録フォームを有効にします。");
+                    // 登録ボタンやログアウトボタンの機能を有効にします
+                    setupAdminPage();
+                
+                } else {
+                    // ログインしていない（匿名ログインにも失敗）
+                    console.log("セットアップページ：匿名ユーザーの取得に失敗しました。");
+                    if(pageError) pageError.textContent = "初期化に失敗しました。ページを再読み込みしてください。";
+                }
+                // ▲▲▲変更点▲▲▲
+            });
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
+        }
+
+        // --- ページの機能を設定する関数 ---
+        // (admin.html と同じもの)
+        function setupAdminPage() {
+            
+            // ログアウトボタンの機能
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    try {
+                        await signOut(auth);
+                        console.log("ログアウトしました。");
+                        const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                        window.location.href = window.location.origin + repoPath + '/index.html'; // トップページに戻る
+                    } catch (error) {
+                        console.error("ログアウト失敗:", error);
+                    }
+                });
+            }
+
+            // 新規メンバー登録ボタンの機能
+            const createButton = document.getElementById('create-user-button');
+            const messageEl = document.getElementById('message');
+            
+            if (createButton) {
+                createButton.addEventListener('click', async () => {
+                    
+                    const email = document.getElementById('new-email').value;
+                    const password = document.getElementById('new-password').value;
+                    const isAdmin = document.getElementById('is-admin').checked; // 管理者として登録するかどうか
+
+                    if (!email || !password) {
+                        messageEl.textContent = 'メールアドレスとパスワードを入力してください。';
+                        messageEl.className = 'text-sm text-red-400 text-center';
+                        return;
+                    }
+
+                    if (password.length < 6) {
+                        messageEl.textContent = 'パスワードは6文字以上で入力してください。';
+                        messageEl.className = 'text-sm text-red-400 text-center';
+                        return;
+                    }
+
+                    messageEl.textContent = '登録処理中...';
+                    messageEl.className = 'text-sm text-yellow-400 text-center';
+
+                    try {
+                        // 1. 一時的なアプリと認証インスタンスを作成
+                        const tempAppName = 'temp-app-for-creation-' + Date.now();
+                        const tempApp = initializeApp(firebaseConfig, tempAppName);
+                        const tempAuth = getAuth(tempApp);
+
+                        // 2. 一時認証でユーザーを作成
+                        const userCredential = await createUserWithEmailAndPassword(tempAuth, email, password);
+                        const newUserId = userCredential.user.uid;
+                        console.log('Authユーザー作成成功:', newUserId);
+                        
+                        // 3. メインのDBインスタンスを使って、役割（Role）をデータベースに保存
+                        // (admin.html と同じ DB (db) を使う)
+                        const roleDocRef = doc(db, `artifacts/${appId}/public/data/user_roles`, newUserId);
+                        await setDoc(roleDocRef, {
+                            email: email,
+                            isAdmin: isAdmin // チェックボックスの状態を保存
+                        });
+
+                        console.log('役割データベース(Firestore)への保存成功。');
+
+                        // 4. 一時認証インスタンスをログアウト
+                        await signOut(tempAuth);
+                        
+                        // 成功メッセージ
+                        messageEl.textContent = `登録成功: ${email} (${isAdmin ? '管理者' : '一般メンバー'})`;
+                        messageEl.className = 'text-sm text-green-400 text-center';
+                        
+                        // フォームをクリア
+                        document.getElementById('new-email').value = '';
+                        document.getElementById('new-password').value = '';
+                        document.getElementById('is-admin').checked = false;
+
+                    } catch (error) {
+                        // 登録失敗
+                        console.error('新規ユーザー登録失敗:', error.code, error.message);
+                        if (error.code === 'auth/email-already-in-use') {
+                            messageEl.textContent = 'このメールアドレスは既に使用されています。';
+                        } else if (error.code === 'auth/weak-password') {
+                            messageEl.textContent = 'パスワードは6文字以上で入力してください。';
+                        } else {
+                            messageEl.textContent = '登録に失敗しました。';
+                        }
+                        messageEl.className = 'text-sm text-red-400 text-center';
+                    }
+                });
+            }
+        }
+
+    </script>
+
+</body>
+</html>

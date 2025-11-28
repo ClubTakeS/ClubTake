@@ -180,6 +180,19 @@
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
+            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+            // ログイン状態に関わらず、グローバル変数とスクリプトを準備します
+            // （`js/login-firebase.js` が `auth` と `db` を見つけられるようにするため）
+            window.firebaseApp = app;
+            window.firebaseAuth = auth;
+            window.firebaseDb = db;
+            
+            // ログインスクリプトを読み込みます
+            // （`onAuthStateChanged` の外に移動しました）
+            loadLoginScript();
+            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+
+
             // ★★★変更★★★ 自動で「匿名」ログイン処理を行「わない」ようにします
             // await signInAnonymously(auth); // ← この行はコメントアウト（または削除）しておきます
 
@@ -188,16 +201,17 @@
                 if (user) {
                     // ログイン成功！ 
                     // user オブジェクトを他のスクリプトで使えるようにグローバルに保存します
-                    window.firebaseApp = app;
-                    window.firebaseAuth = auth;
-                    window.firebaseDb = db; // ★★★変更★★★ 新しいDBを保存
+                    // （`window.firebaseApp` などは既に設定済み）
                     window.firebaseUser = user;
                     
                     // 準備ができたので、ログインスクリプトを読み込みます
                     // (js/login-firebase.js はステップ2で修正します)
-                    if (!document.querySelector('script[src="js/login-firebase.js"]')) {
-                        loadLoginScript();
-                    }
+                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                    // （この呼び出しは上に移動したので、ここでは不要です）
+                    // if (!document.querySelector('script[src="js/login-firebase.js"]')) {
+                    //     loadLoginScript();
+                    // }
+                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
                 } else {
                     // ログイン失敗...

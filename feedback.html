@@ -181,77 +181,89 @@
         const emailInput = document.getElementById('email');
         const contentInput = document.getElementById('content');
 
-        try {
-            // Firebaseを初期化します
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getDatabase(app);
-            
-            // このページは誰でも使えるように「匿名」でログインします
-            await signInAnonymously(auth);
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // 匿名ユーザーIDを取得
-                    currentUserId = user.uid;
-                    console.log("匿名ログイン成功:", currentUserId);
-                } else {
-                    console.log("匿名ログインに失敗しました。");
-                }
-            });
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点（トップレベルのawaitを防ぐ） ▼▼▼▼▼▼▼▼▼▼
+        
+        // ページを初期化する非同期関数を定義します
+        async function initializePage() {
+            try {
+                // Firebaseを初期化します
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getDatabase(app);
+                
+                // このページは誰でも使えるように「匿名」でログインします
+                // (async関数の中なので await してもフリーズしません)
+                await signInAnonymously(auth);
 
-            // 送信ボタンの機能を設定
-            if (sendButton) {
-                sendButton.addEventListener('click', async () => {
-                    const name = nameInput.value;
-                    const email = emailInput.value;
-                    const content = contentInput.value;
-
-                    if (!content) {
-                        messageEl.textContent = 'ご意見・ご感想を入力してください。';
-                        messageEl.className = 'text-sm text-red-400 text-center';
-                        return;
-                    }
-
-                    messageEl.textContent = '送信中...';
-                    messageEl.className = 'text-sm text-yellow-400 text-center';
-                    sendButton.disabled = true;
-
-                    try {
-                        // Firebase にフィードバックを送信 (pushで新しいIDを自動生成)
-                        const feedbackRef = ref(db, 'feedback');
-                        await push(feedbackRef, {
-                            name: name,
-                            email: email,
-                            content: content,
-                            createdAt: serverTimestamp(), // Firebaseサーバーの時刻を保存
-                            userId: currentUserId // 匿名ユーザーのIDを保存
-                        });
-                        
-                        messageEl.textContent = 'ご意見ありがとうございます。送信しました。';
-                        messageEl.className = 'text-sm text-green-400 text-center';
-                        // フォームをクリア
-                        nameInput.value = '';
-                        emailInput.value = '';
-                        contentInput.value = ''; 
-                        sendButton.disabled = false;
-
-                    } catch (error) {
-                        console.error("フィードバック送信失敗:", error);
-                        messageEl.textContent = '送信に失敗しました。';
-                        messageEl.className = 'text-sm text-red-400 text-center';
-                        sendButton.disabled = false;
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // 匿名ユーザーIDを取得
+                        currentUserId = user.uid;
+                        console.log("匿名ログイン成功:", currentUserId);
+                    } else {
+                        console.log("匿名ログインに失敗しました。");
                     }
                 });
-            }
 
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            if (messageEl) {
-                messageEl.textContent = 'システムの初期化に失敗しました。';
-                messageEl.className = 'text-sm text-red-400 text-center';
+                // 送信ボタンの機能を設定
+                if (sendButton) {
+                    sendButton.addEventListener('click', async () => {
+                        const name = nameInput.value;
+                        const email = emailInput.value;
+                        const content = contentInput.value;
+
+                        if (!content) {
+                            messageEl.textContent = 'ご意見・ご感想を入力してください。';
+                            messageEl.className = 'text-sm text-red-400 text-center';
+                            return;
+                        }
+
+                        messageEl.textContent = '送信中...';
+                        messageEl.className = 'text-sm text-yellow-400 text-center';
+                        sendButton.disabled = true;
+
+                        try {
+                            // Firebase にフィードバックを送信 (pushで新しいIDを自動生成)
+                            const feedbackRef = ref(db, 'feedback');
+                            await push(feedbackRef, {
+                                name: name,
+                                email: email,
+                                content: content,
+                                createdAt: serverTimestamp(), // Firebaseサーバーの時刻を保存
+                                userId: currentUserId // 匿名ユーザーのIDを保存
+                            });
+                            
+                            messageEl.textContent = 'ご意見ありがとうございます。送信しました。';
+                            messageEl.className = 'text-sm text-green-400 text-center';
+                            // フォームをクリア
+                            nameInput.value = '';
+                            emailInput.value = '';
+                            contentInput.value = ''; 
+                            sendButton.disabled = false;
+
+                        } catch (error) {
+                            console.error("フィードバック送信失敗:", error);
+                            messageEl.textContent = '送信に失敗しました。';
+                            messageEl.className = 'text-sm text-red-400 text-center';
+                            sendButton.disabled = false;
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                if (messageEl) {
+                    messageEl.textContent = 'システムの初期化に失敗しました。';
+                    messageEl.className = 'text-sm text-red-400 text-center';
+                }
             }
         }
+
+        // ページ初期化関数を実行します
+        initializePage();
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+
     </script>
 
 </body>

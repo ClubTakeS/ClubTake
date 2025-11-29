@@ -36,7 +36,7 @@
 </head>
 <body class="bg-black text-gray-200 font-sans">
 
-    <!-- 共通ヘッダー（変更なし） -->
+    <!-- 共通ヘッダー -->
     <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
         <nav class="container mx.auto px-6 py-4 flex justify-between items-center">
             <!-- ロゴ -->
@@ -160,6 +160,40 @@
                 <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
 
 
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（フィードバック受信箱の追加） ▼▼▼▼▼▼▼▼▼▼ -->
+                <div id="feedback-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
+                    <h2 class="text-2xl font-serif-jp text-center mb-8 border-b border-gray-700 pb-4">
+                        受信したフィードバック
+                    </h2>
+                    
+                    <!-- 読み込み中メッセージ -->
+                    <div id="feedback-loading-message" class="text-center text-gray-400">
+                        フィードバックを読み込んでいます...
+                    </div>
+                    
+                    <!-- フィードバック一覧が挿入されるコンテナ -->
+                    <div id="feedback-list-container" class="space-y-8">
+                        <!-- ここに JavaScript によって記事が動的に挿入されます -->
+                        
+                        <!-- (表示例)
+                        <article class="border-b border-gray-800 pb-6">
+                            <header class="mb-2 flex justify-between items-center">
+                                <h3 class="text-lg font-serif-jp text-brand-gold-light">
+                                    投稿者: 匿名さん
+                                </h3>
+                                <time class="text-sm text-gray-500">2025年11月29日</time>
+                            </header>
+                            <p class="text-sm text-gray-400 mb-2">Email: member@example.com</p>
+                            <div class="text-gray-300 whitespace-pre-wrap">
+                                フィードバックの本文がここに表示されます。
+                            </div>
+                        </article>
+                        -->
+                    </div>
+                </div>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+
+
                 <!-- 新規メンバー追加フォーム (変更なし) -->
                 <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;">
                     
@@ -233,7 +267,9 @@
         
         // ▼▼▼▼▼▼▼▼▼▼ 変更点（push, serverTimestamp をインポート） ▼▼▼▼▼▼▼▼▼▼
         // Realtime Database の機能を読み込みます
-        import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点（query, orderByChild をインポート） ▼▼▼▼▼▼▼▼▼▼
+        import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp, query, orderByChild } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
         // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
         // あなたの「本物の」設定情報を貼り付けます
@@ -289,12 +325,17 @@
                         document.getElementById('member-list-section').style.display = 'block';
                         // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                         document.getElementById('announcement-section').style.display = 'block';
+                        document.getElementById('feedback-section').style.display = 'block'; // フィードバックセクションも表示
                         // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                         
                         // 登録ボタンやログアウトボタンの機能を有効にします
                         setupAdminPage();
                         // メンバー一覧の読み込みを開始します
                         loadAndDisplayMembers();
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                        // フィードバックの読み込みを開始します
+                        loadAndDisplayFeedback();
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                     } else {
                         // 管理者権限なし
                         console.log("管理者権限がありません。");
@@ -352,34 +393,76 @@
             });
         }
         
-        function addEventListenersToButtons() {
-            const listMessage = document.getElementById('list-message');
-            document.querySelectorAll('.role-change-button').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    const userId = event.target.dataset.userId;
-                    const newRole = (event.target.dataset.newRole === 'true');
-                    listMessage.textContent = '権限を変更中...';
-                    listMessage.className = 'text-sm text-yellow-400 text-center';
-                    try {
-                        await updateUserRole(userId, newRole);
-                        listMessage.textContent = `権限を「${newRole ? '管理者' : '一般'}」に変更しました。`;
-                        listMessage.className = 'text-sm text-green-400 text-center';
-                    } catch (error) {
-                        console.error("権限変更失敗:", error);
-                        listMessage.textContent = '権限の変更に失敗しました。';
-                        listMessage.className = 'text-sm text-red-400 text-center';
-                    }
-                    setTimeout(() => { listMessage.textContent = ''; }, 3000);
-                });
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点（フィードバック読み込み関数を追加） ▼▼▼▼▼▼▼▼▼▼
+        /**
+         * 受信したフィードバックを読み込んで表示する関数
+         */
+        function loadAndDisplayFeedback() {
+            const feedbackRef = ref(db, 'feedback');
+            const listContainer = document.getElementById('feedback-list-container');
+            const loadingMessage = document.getElementById('feedback-loading-message');
+
+            // createdAt（作成日時）で並び替えて、最新のものを取得するクエリ
+            const feedbackQuery = query(feedbackRef, orderByChild('createdAt'));
+
+            // onValue を使って、データベースの変更をリアルタイムで監視します
+            onValue(feedbackQuery, (snapshot) => {
+                if (snapshot.exists()) {
+                    const feedbackList = snapshot.val();
+                    
+                    if(loadingMessage) loadingMessage.style.display = 'none';
+                    listContainer.innerHTML = '';
+                    
+                    // データベースから取得したデータを配列に変換し、「新しい順」に並び替える
+                    const feedbackArray = Object.entries(feedbackList)
+                        .map(([key, value]) => ({ key, ...value }))
+                        .sort((a, b) => b.createdAt - a.createdAt); // 降順（新しい順）
+                    
+                    // XSS対策の関数
+                    const escapeHTML = (str) => {
+                        if (typeof str !== 'string') return '';
+                        return str.replace(/[&<>"']/g, (match) => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                        }[match]));
+                    };
+                        
+                    feedbackArray.forEach(post => {
+                        const date = new Date(post.createdAt);
+                        const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                        
+                        // 投稿者名（名前があれば名前、なければメールアドレス、どちらもなければ「匿名さん」）
+                        const authorName = post.name || (post.email ? post.email.split('@')[0] : '匿名さん');
+                        const authorEmail = post.email ? `<p class="text-sm text-gray-400 mb-2">Email: ${escapeHTML(post.email)}</p>` : '';
+
+                        const article = document.createElement('article');
+                        article.className = 'border-b border-gray-800 pb-6';
+                        
+                        article.innerHTML = `
+                            <header class="mb-2 flex justify-between items-center">
+                                <h3 class="text-lg font-serif-jp text-brand-gold-light">
+                                    投稿者: ${escapeHTML(authorName)}
+                                </h3>
+                                <time class="text-sm text-gray-500">${formattedDate}</time>
+                            </header>
+                            ${authorEmail}
+                            <div class="text-gray-300 whitespace-pre-wrap">${escapeHTML(post.content)}</div>
+                        `;
+                        
+                        listContainer.appendChild(article);
+                    });
+
+                } else {
+                    if(loadingMessage) loadingMessage.textContent = '現在、受信したフィードバックはありません。';
+                }
+            }, (error) => {
+                console.error("フィードバックの読み込み失敗:", error);
+                if(loadingMessage) loadingMessage.textContent = 'フィードバックの読み込みに失敗しました。';
+                if (error.code === "PERMISSION_DENIED") {
+                    if(loadingMessage) loadingMessage.textContent = 'フィードバックの読み取り権限がありません。';
+                }
             });
         }
-        
-        async function updateUserRole(userId, newRole) {
-            const userRoleRef = ref(db, `user_roles/${userId}`);
-            await update(userRoleRef, {
-                isAdmin: newRole
-            });
-        }
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
 
         // --- ページの機能を設定する関数 ---

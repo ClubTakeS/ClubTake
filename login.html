@@ -126,7 +126,7 @@
                             <input type="email" id="request-email" required
                                 class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
                         </div>
-                        <!-- ▼▼▼▼▼▼▼▼▼▼ 追加: パスワード入力欄 ▼▼▼▼▼▼▼▼▼▼ -->
+                        <!-- 追加: パスワード入力欄 -->
                         <div>
                             <label for="request-password" class="block text-sm font-medium text-gray-300">希望パスワード (6文字以上)</label>
                             <input type="password" id="request-password" required minlength="6"
@@ -254,18 +254,24 @@
                 const roleRef = ref(db, `user_roles/${uid}`);
                 const snapshot = await get(roleRef);
                 
+                // --- リダイレクトロジックの修正 ---
+                const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+
                 if (snapshot.exists()) {
                     const userData = snapshot.val();
                     const isAdmin = userData.isAdmin === true;
                     
                     if (isAdmin) {
                         adminLink.classList.remove('hidden');
+                        // 1. 管理者は admin.html へリダイレクト
+                        window.location.href = window.location.origin + repoPath + '/admin.html'; 
+                        return; // リダイレクト処理後はここで終了
                     }
-
-                    // 役割が確認できたら、ログイン成功とみなしホームへリダイレクト
-                    const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-                    window.location.href = window.location.origin + repoPath + '/index.html'; 
                     
+                    // 2. 一般メンバーは members.html へリダイレクト
+                    window.location.href = window.location.origin + repoPath + '/members.html';
+                    return;
+
                 } else {
                     // 役割データがない（Authユーザーだがメンバーではない）場合は、申請状況を確認
                     checkPendingRequest(uid);
@@ -297,7 +303,7 @@
                     // フォームの内容を申請内容で埋める (メールアドレスなど)
                     document.getElementById('request-name').value = snapshot.val().name || '';
                     document.getElementById('request-email').value = snapshot.val().email || '';
-                    document.getElementById('request-password').value = snapshot.val().password || ''; // パスワードも表示はしないが、データがあれば保持
+                    // パスワードはセキュリティのため、読み込み時にはフォームに自動入力しない
                 } else {
                     // 未申請の場合
                     applicationStatus.classList.add('hidden');
@@ -323,6 +329,8 @@
                 inactiveTab.classList.remove('active');
                 activeContent.classList.remove('hidden');
                 inactiveContent.classList.add('hidden');
+                loginMessage.textContent = ''; // メッセージをクリア
+                requestMessage.textContent = ''; // メッセージをクリア
 
                 if (activeTab.id === 'tab-signup' && isAuthReady && auth.currentUser) {
                     // 入会申請タブに切り替えたとき、かつAuth準備完了している場合のみチェック
@@ -355,10 +363,9 @@
                 } catch (error) {
                     console.error("ログイン失敗:", error);
                     let msg = 'ログインに失敗しました。';
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                         msg = 'メールアドレスまたはパスワードが正しくありません。';
                     } else if (error.code === 'auth/too-many-requests') {
-                        // ログインフォームでの too-many-requests エラーも表示
                         msg = '連続した試行のため、しばらくしてから再度お試しください。';
                     }
                     loginMessage.textContent = msg;
@@ -380,8 +387,6 @@
                     try {
                         const anonUserCredential = await signInAnonymously(auth);
                         currentUid = anonUserCredential.user.uid;
-                        // 匿名サインインが成功した場合、onAuthStateChangedリスナーが発火し、
-                        // isAuthReadyがtrueになり、checkPendingRequestが実行される
                     } catch (error) {
                         console.error("匿名サインイン失敗:", error);
                         requestMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
@@ -390,7 +395,7 @@
                     }
                 }
 
-                // 認証済みユーザーIDがない場合、処理を停止（通常は匿名サインインされているはず）
+                // 認証済みユーザーIDがない場合、処理を停止
                 if (!currentUid) {
                     requestMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
                     return;
@@ -399,9 +404,7 @@
                 const uid = currentUid;
                 const name = document.getElementById('request-name').value;
                 const email = document.getElementById('request-email').value;
-                // ▼▼▼▼▼▼▼▼▼▼ 修正: パスワードを取得 ▼▼▼▼▼▼▼▼▼▼
                 const password = document.getElementById('request-password').value;
-                // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
                 
                 const button = document.getElementById('request-button');
                 
@@ -409,14 +412,13 @@
                 requestMessage.className = 'text-sm text-yellow-400 text-center';
                 button.disabled = true;
 
-                // ▼▼▼▼▼▼▼▼▼▼ 追加: パスワードの入力チェック ▼▼▼▼▼▼▼▼▼▼
+                // パスワードの入力チェック
                 if (password.length < 6) {
                     requestMessage.textContent = 'パスワードは6文字以上で入力してください。';
                     requestMessage.className = 'text-sm text-red-400 text-center';
                     button.disabled = false;
                     return;
                 }
-                // ▲▲▲▲▲▲▲▲▲▲ 追加 ▼▼▼▼▼▼▼▼▼▼
 
                 try {
                     // Realtime Database に申請データを書き込む (pending_users)

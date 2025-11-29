@@ -57,26 +57,48 @@
 
     <!-- メインコンテンツ -->
     <main>
-        <section class="py-20 md:py-24" style="min-height: calc(100vh - 158px);">
+        
+        <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（キービジュアル追加） ▼▼▼▼▼▼▼▼▼▼ -->
+        <!-- 1. メンバーズページ: セクション1 (ファーストビュー) -->
+        <section class="h-[70vh] min-h-[500px] relative flex items-center justify-center text-center text-white overflow-hidden">
             
-            <div class="container mx-auto px-6">
-
-                <!-- ページタイトル -->
-                <h1 class="text-3xl md:text-4xl font-serif-jp mb-12 text-center">
-                    <span id="welcome-message" class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                        <!-- ここに「〇〇様、ようこそ」と表示されます -->
-                        読み込み中...
-                    </span>
+            <!-- 背景画像（ラウンジや書斎のイメージ） -->
+            <div class="absolute inset-0 bg-cover bg-center z-0" 
+                 style="background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80');">
+                 <!-- (写真提供: GIO SUM on Unsplash) -->
+            </div>
+            
+            <!-- 背景のオーバーレイ（黒い透かし） -->
+            <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
+            
+            <!-- 中央配置テキスト（ウェルカムメッセージ） -->
+            <div class="relative z-20 p-8 space-y-4">
+                <h1 id="welcome-message" class="text-4xl md:text-6xl font-serif-jp font-bold hero-text-1" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+                    <!-- ここに「〇〇様、ようこそ」と表示されます -->
+                    読み込み中...
                 </h1>
                 
                 <!-- エラーメッセージ（ログインしていない時など） -->
-                <div id="page-error-message" class="max-w-4xl mx-auto text-center text-red-400 text-lg mb-8"></div>
+                <p id="page-error-message" class="text-red-400 text-lg hero-text-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);"></p>
+            </div>
+        </section>
+        <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+
+
+        <section class="py-20 md:py-24">
+            
+            <div class="container mx-auto px-6">
+
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（元のh1とpは削除） ▼▼▼▼▼▼▼▼▼▼ -->
+                <!-- (キービジュアルのセクションに移動しました) -->
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
                 
 
                 <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせセクションの追加） ▼▼▼▼▼▼▼▼▼▼ -->
 
                 <!-- メンバー専用お知らせエリア -->
-                <div id="announcements-section" class="max-w-3xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;"> <!-- 初期状態は非表示 -->
+                <!-- ▼▼▼▼▼ 変更点（アニメーションのため .fade-in を付与） ▼▼▼▼▼ -->
+                <div id="announcements-section" class="max-w-3xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 fade-in" style="display: none;"> <!-- 初期状態は非表示 -->
                     <h2 class="text-2xl font-serif-jp text-center mb-8 border-b border-gray-700 pb-4">
                         メンバー専用お知らせ
                     </h2>
@@ -120,6 +142,10 @@
             </p>
         </div>
     </footer>
+
+    <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（アニメーション用JSの読み込み） ▼▼▼▼▼▼▼▼▼▼ -->
+    <script src="js/main.js" defer></script>
+    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
 
     <!-- Firebaseの機能を読み込む -->
     <script type="module">
@@ -273,7 +299,11 @@
                         });
 
                         const article = document.createElement('article');
-                        article.className = 'border-b border-gray-800 pb-6 fade-in'; // fade-inクラスを追加
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点（アニメーション競合の削除） ▼▼▼▼▼▼▼▼▼▼
+                        // .fade-in はHTML側で設定し、.is-visible は js/main.js が自動で
+                        // やってくれるので、ここでのクラス追加は不要です。
+                        article.className = 'border-b border-gray-800 pb-6';
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                         
                         article.innerHTML = `
                             <header class="mb-2">
@@ -286,11 +316,12 @@
                         listContainer.appendChild(article);
                     });
                     
-                    // アニメーションをトリガー
-                    // (style.css に .fade-in { animation: ... } がある前提)
-                    setTimeout(() => {
-                        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
-                    }, 10);
+                    // ▼▼▼▼▼▼▼▼▼▼ 変更点（アニメーション競合の削除） ▼▼▼▼▼▼▼▼▼▼
+                    // (js/main.js がIntersectionObserverで実行するため、このブロックは削除します)
+                    // setTimeout(() => {
+                    //     document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+                    // }, 10);
+                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
 
                 } else {

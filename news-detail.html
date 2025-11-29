@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubTake - お知らせ</title>
+    <!-- Tailwind CSS を読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSSファイルを読み込みます -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        // Tailwind CSSのカスタム設定
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif-jp': ['"Noto Serif JP"', 'serif']
+                    },
+                    colors: {
+                        // ワイヤーフレームで指定したアクセント色（ゴールド）
+                        'brand-gold': '#C0A16B',
+                        'brand-gold-light': '#DBC18B', // 少し明るく
+                        'brand-gold-dark': '#A0814B'  // 少し暗く
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-gray-200 font-sans">
+    
+    <!-- 共通ヘッダー (index.html と同じ) -->
+    <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- ロゴ -->
+            <div class="text-2xl font-serif-jp font-bold">
+                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                    ClubTake
+                </span>
+            </div>
+            <!-- ナビゲーション（PC用） -->
+            <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
+                <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
+                <a href="login.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Members</a>
+                <a href="#" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main>
+        <section class="py-20 md:py-32 bg-black" style="min-height: calc(100vh - 158px);">
+            <div class="container mx-auto px-6">
+                
+                <!-- お知らせ記事が挿入されるコンテナ -->
+                <article id="news-article-container" class="max-w-3xl mx-auto">
+                    
+                    <!-- 読み込み中メッセージ -->
+                    <div id="loading-message" class="text-center text-gray-400 text-lg py-16">
+                        お知らせを読み込んでいます...
+                    </div>
+                    
+                    <!-- (表示例)
+                    <header class="mb-8 border-b border-gray-700 pb-6">
+                        <p class="text-sm text-gray-500 mb-2">
+                            <time>2025年11月29日</time> | <span class="font-medium text-brand-gold-light">催事</span>
+                        </p>
+                        <h1 class="text-3xl md:text-4xl font-serif-jp text-brand-gold-light">
+                            一般公開のお知らせタイトル
+                        </h1>
+                    </header>
+                    <div id="news-content" class="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        お知らせの本文（content）がここに表示されます。
+                        改行もそのまま反映されます。
+                    </div>
+                    -->
+
+                </article>
+
+                <!-- 戻るボタン -->
+                <div class="max-w-3xl mx-auto text-center mt-12 pt-8 border-t border-gray-800">
+                    <a href="index.html" class="text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
+                        &larr; お知らせ一覧に戻る
+                    </a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- 共通フッター (index.html と同じ) -->
+    <footer class="py-16 bg-black border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <!-- ロゴ -->
+            <div class="text-2xl font-serif-jp font-bold mb-4">
+                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                    ClubTake
+                </span>
+            </div>
+            <!-- 住所など -->
+            <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
+            <p class="text-sm">TEL: 03-XXXX-XXXX</p>
+            <!-- フッターナビ -->
+            <div class="flex justify-center space-x-6 my-6 text-sm">
+                <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
+                <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
+            </div>
+            <!-- コピーライト -->
+            <p class="text-xs text-gray-500 mt-8">
+                &copy; 2025 ClubTake. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Firebaseの機能を読み込むスクリプト -->
+    <script type="module">
+        // Firebaseの基本的な機能（App）を読み込みます
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Realtime Database の機能を読み込みます (get, ref を追加)
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // あなたの「本物の」設定情報を貼り付けます
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
+        
+        // Realtime Database の URL を config に追加します
+        firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
+
+        let app, db;
+        const articleContainer = document.getElementById('news-article-container');
+        const loadingMessage = document.getElementById('loading-message');
+
+        // XSS（クロスサイトスクリプティング）対策：
+        // ユーザーが入力した可能性のあるテキストを安全に表示するための関数
+        const escapeHTML = (str) => {
+            if (typeof str !== 'string') return '';
+            return str.replace(/[&<>"']/g, (match) => {
+                return {
+                  '&': '&amp;',
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  '"': '&quot;',
+                  "'": '&#39;'
+                }[match];
+            });
+        };
+
+        try {
+            // Firebaseを初期化します
+            app = initializeApp(firebaseConfig);
+            // Realtime Database を初期化します
+            db = getDatabase(app);
+            
+            // URLからお知らせのIDを取得します
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+
+            if (newsId) {
+                // IDがある場合、そのお知らせを読み込みます
+                loadSingleNews(newsId);
+            } else {
+                // IDがない場合
+                loadingMessage.textContent = "記事のIDが指定されていません。";
+            }
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            if(loadingMessage) loadingMessage.textContent = "システムの初期化に失敗しました。";
+        }
+
+        /**
+         * 指定されたIDの「一般公開用お知らせ」を1件だけ読み込む関数
+         * @param {string} newsId - 読み込むお知らせのID
+         */
+        async function loadSingleNews(newsId) {
+            // データベースの正確なパス (public_news/ID) を指定
+            const newsRef = ref(db, `public_news/${newsId}`);
+            
+            try {
+                const snapshot = await get(newsRef);
+
+                if (snapshot.exists()) {
+                    // データが見つかった場合
+                    const post = snapshot.val();
+                    
+                    // 読み込みメッセージを非表示に
+                    loadingMessage.style.display = 'none';
+
+                    // タイムスタンプ（数字）を「YYYY年MM月DD日」の形式に変換
+                    const date = new Date(post.createdAt);
+                    const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                    
+                    // カテゴリに応じた色を決定
+                    const categoryClass = post.category === '催事' ? 'text-brand-gold-light' : 'text-gray-400';
+                    
+                    // 記事のHTMLを組み立てる
+                    articleContainer.innerHTML = `
+                        <header class="mb-8 border-b border-gray-700 pb-6">
+                            <p class="text-sm text-gray-500 mb-2">
+                                <time>${formattedDate}</time> | <span class="font-medium ${categoryClass}">${escapeHTML(post.category)}</span>
+                            </p>
+                            <h1 class="text-3xl md:text-4xl font-serif-jp text-brand-gold-light">
+                                ${escapeHTML(post.title)}
+                            </h1>
+                        </header>
+                        <div id="news-content" class="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            ${escapeHTML(post.content)}
+                        </div>
+                    `;
+
+                } else {
+                    // IDはあったが、データが見つからなかった場合
+                    loadingMessage.textContent = '指定されたお知らせが見つかりません。';
+                }
+            } catch (error) {
+                // データの読み込みに失敗した場合
+                console.error("お知らせの読み込み失敗:", error);
+                loadingMessage.textContent = 'お知らせの読み込みに失敗しました。';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClubTake - ログイン</title>
-    
-    <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
+    <title>ClubTake - ログイン / 申請</title>
     <!-- Tailwind CSS を読み込みます -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSSのカスタム設定（CDNのすぐ下に移動しました） -->
     <script>
         // Tailwind CSSのカスタム設定
         tailwind.config = {
@@ -20,25 +21,23 @@
                         'serif-jp': ['"Noto Serif JP"', 'serif']
                     },
                     colors: {
-                        // ワイヤーフレームで指定したアクセント色（ゴールド）
+                        // アクセント色（ゴールド）
                         'brand-gold': '#C0A16B',
-                        'brand-gold-light': '#DBC18B', // 少し明るく
-                        'brand-gold-dark': '#A0814B'  // 少し暗く
+                        'brand-gold-light': '#DBC18B',
+                        'brand-gold-dark': '#A0814B'
                     }
                 }
             }
         }
     </script>
-    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
-
-    <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- CSSファイルを読み込みます -->
-    <link rel="stylesheet" href="css/style.css">
-
+    <style>
+        /* ClubTakeの基本スタイル (黒とゴールド) */
+        body { background-color: black; color: #E5E7EB; font-family: 'Inter', sans-serif; }
+        .tab-button.active { 
+            border-bottom: 2px solid #C0A16B; 
+            color: #C0A16B;
+        }
+    </style>
 </head>
 <body class="bg-black text-gray-200 font-sans">
 
@@ -55,173 +54,378 @@
             <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
                 <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
                 <a href="login.html" class="text-white hover:text-brand-gold transition-colors duration-300">Members</a>
-                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
                 <a href="feedback.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+                <!-- 管理者リンクはAuthの状態によってJSで表示/非表示を切り替えます -->
+                <a href="admin.html" id="admin-link" class="hidden text-green-400 hover:text-green-200 transition-colors duration-300">Admin</a>
             </div>
         </nav>
     </header>
 
     <!-- メインコンテンツ -->
-    <main>
-        <section class="relative flex items-center justify-center py-20 md:py-32" style="min-height: calc(100vh - 158px);">
-            
-            <div class="container mx-auto px-6">
-                <div class="max-w-md mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 fade-in is-visible">
-                    
-                    <h2 class="text-3xl font-serif-jp text-center mb-8">
-                        <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                            メンバーズ ログイン
-                        </span>
-                    </h2>
+    <main class="min-h-screen pt-20 pb-16">
+        <div class="container mx-auto px-6 max-w-lg">
 
-                    <form id="login-form" action="#" method="POST" class="space-y-6">
+            <!-- タブ切り替え -->
+            <div class="flex border-b border-gray-700 mb-8">
+                <button id="tab-login" class="tab-button active flex-1 py-3 text-lg font-serif-jp tracking-wide transition-colors duration-300 hover:text-brand-gold">
+                    メンバーログイン
+                </button>
+                <button id="tab-signup" class="tab-button flex-1 py-3 text-lg font-serif-jp tracking-wide transition-colors duration-300 hover:text-brand-gold">
+                    入会申請
+                </button>
+            </div>
+
+            <!-- フォームコンテナ -->
+            <div id="form-container" class="bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12">
+                
+                <!-- 1. ログインフォーム -->
+                <div id="login-form-content" class="tab-content">
+                    <h2 class="text-2xl font-serif-jp text-center mb-8">メンバーログイン</h2>
+                    <form id="login-form" class="space-y-6">
+                        <p class="text-sm text-gray-400 text-center">メンバーID（メールアドレス）とパスワードでログインしてください。</p>
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-300">
-                                メールアドレス
-                            </label>
-                            <div class="mt-1">
-                                <input id="email" name="email" type="email" autocomplete="email" required
-                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
-                            </div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-300">メールアドレス</label>
+                            <input id="login-email" name="email" type="email" required
+                                class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
                         </div>
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-300">
-                                パスワード
-                            </label>
-                            <div class="mt-1">
-                                <input id="password" name="password" type="password" autocomplete="current-password" required
-                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
-                            </div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-300">パスワード (6文字以上)</label>
+                            <input id="login-password" name="password" type="password" required
+                                class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
                         </div>
                         <div class="h-5">
-                            <!-- メッセージ表示エリア -->
-                            <p id="error-message" class="text-sm text-red-400 text-center"></p>
-                        </div>
-                        <div class="text-right text-sm -mt-2">
-                            <a href="password-reset.html" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
-                                パスワードをお忘れですか？
-                            </a>
+                            <p id="login-message" class="text-sm text-red-400 text-center"></p>
                         </div>
                         <div>
-                            <button type="submit"
+                            <button type="submit" id="login-button"
                                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
                                 ログイン
                             </button>
                         </div>
-                        
-                        <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（登録申請リンク） ▼▼▼▼▼▼▼▼▼▼ -->
-                        <div class="text-center text-sm mt-6 pt-6 border-t border-gray-700">
-                            <a href="signup.html" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
-                                新規会員登録（申請）はこちら
-                            </a>
+                    </form>
+                    <p class="text-center text-sm mt-4">
+                        <a href="#" class="text-gray-500 hover:text-brand-gold transition-colors duration-300">パスワードをお忘れですか？</a>
+                    </p>
+                </div>
+
+                <!-- 2. 入会申請フォーム -->
+                <div id="signup-form-content" class="tab-content hidden">
+                    <h2 class="text-2xl font-serif-jp text-center mb-8">新規入会申請</h2>
+                    <form id="join-request-form" class="space-y-6">
+                        <p class="text-sm text-gray-400 text-center">管理者が承認後、メンバーとしてログイン可能になります。まずは申請を行ってください。</p>
+                        <div id="application-status" class="text-center text-yellow-400 text-sm hidden">
+                            <!-- JSで申請状況を表示 -->
                         </div>
-                        <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
-                        
+                        <div>
+                            <label for="request-name" class="block text-sm font-medium text-gray-300">お名前 (ニックネーム可)</label>
+                            <input type="text" id="request-name" required
+                                class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                        </div>
+                        <div>
+                            <label for="request-email" class="block text-sm font-medium text-gray-300">メールアドレス</label>
+                            <input type="email" id="request-email" required
+                                class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                        </div>
+                        <div class="h-5">
+                            <p id="request-message" class="text-sm text-red-400 text-center"></p>
+                        </div>
+                        <div>
+                            <button type="submit" id="request-button"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light transition-all duration-300">
+                                登録を申請する
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
-        </section>
+
+        </div>
     </main>
 
     <!-- 共通フッター -->
-            <div class="flex justify-center space-x-6 my-6 text-sm">
-                <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
-                <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
-            </div>
+    <footer class="py-16 bg-black border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-400">
             <p class="text-xs text-gray-500 mt-8">
                 &copy; 2025 ClubTake. All Rights Reserved.
             </p>
         </div>
     </footer>
 
-    <!-- アニメーション用の js/main.js -->
-    <script src="js/main.js" defer></script>
-    
-    <!-- Firebaseの機能を読み込むためのコード -->
-    
-    <!-- Firebaseの機能（ライブラリ）を読み込むためのコード -->
+
+    <!-- Firebaseの機能を読み込む -->
     <script type="module">
-        // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // Firebaseのログイン機能（Auth）を読み込みます
-        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        // ★★★変更★★★ Firestore の代わりに Realtime Database の機能を読み込みます
-        // import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getDatabase } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        
-        
-        // あなたの「本物の」設定情報を貼り付けます
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword,
+            signInAnonymously,
+            signOut,
+            setPersistence,
+            browserLocalPersistence
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get, 
+            serverTimestamp,
+            remove
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // Firebase設定 (admin.htmlからコピー)
         const firebaseConfig = {
-          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
-          authDomain: "clubtake-257af.firebaseapp.com",
-          projectId: "clubtake-257af",
-          storageBucket: "clubtake-257af.firebasestorage.app",
-          messagingSenderId: "871043706318",
-          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
-          measurementId: "G-NVXMV89KHP"
+            apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+            authDomain: "clubtake-257af.firebaseapp.com",
+            projectId: "clubtake-257af",
+            storageBucket: "clubtake-257af.firebasestorage.app",
+            messagingSenderId: "871043706318",
+            appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+            measurementId: "G-NVXMV89KHP"
         };
-        
-        // ★★★変更★★★ Realtime Database の URL を config に追加します
         firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
 
-        // appId は config から取得します
-        const appId = firebaseConfig.appId;
-        // （`initialAuthToken` はもう使いません）
+        // グローバル変数
+        let app, db, auth, userId;
+        let isAuthReady = false; // 認証準備完了フラグ
+        
+        // UI要素
+        const adminLink = document.getElementById('admin-link');
+        const loginForm = document.getElementById('login-form');
+        const loginMessage = document.getElementById('login-message');
+        const joinRequestForm = document.getElementById('join-request-form');
+        const requestMessage = document.getElementById('request-message');
+        const applicationStatus = document.getElementById('application-status');
+        const tabLogin = document.getElementById('tab-login');
+        const tabSignup = document.getElementById('tab-signup');
+        const loginContent = document.getElementById('login-form-content');
+        const signupContent = document.getElementById('signup-form-content');
 
-        try {
-            // Firebaseを初期化します
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            // ★★★変更★★★ Realtime Database を初期化します
-            const db = getDatabase(app);
-            
-            // ログイン状態をブラウザに保存するように設定
-            await setPersistence(auth, browserLocalPersistence);
+        async function initializeAppCore() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
+                auth = getAuth(app);
 
-            // ログイン状態に関わらず、グローバル変数とスクリプトを準備します
-            // （`js/login-firebase.js` が `auth` と `db` を見つけられるようにするため）
-            window.firebaseApp = app;
-            window.firebaseAuth = auth;
-            window.firebaseDb = db;
-            
-            // ログインスクリプトを読み込みます
-            loadLoginScript();
+                // ログイン状態をブラウザに保存するように設定
+                await setPersistence(auth, browserLocalPersistence);
+                
+                setupAuthListener();
+                setupUIListeners();
 
+                // ページの読み込みが完了したら、匿名サインインを試みる (AuthListenerに依存)
 
-            // ログイン状態を監視します
-            onAuthStateChanged(auth, (user) => {
+            } catch (error) {
+                console.error("Firebase初期化エラー:", error);
+            }
+        }
+        
+        function setupAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                // 認証状態が確定した
+                isAuthReady = true;
+
                 if (user) {
-                    // ログイン成功！ 
-                    // user オブジェクトを他のスクリプトで使えるようにグローバルに保存します
-                    // （`window.firebaseApp` などは既に設定済み）
-                    window.firebaseUser = user;
-                    
+                    userId = user.uid;
+                    if (user.isAnonymous) {
+                         // 匿名ユーザーの場合、認証済みユーザーによるサインインを妨げないようにする
+                         // 申請タブがアクティブな場合のみ、申請状況をチェック
+                         if (tabSignup.classList.contains('active')) {
+                             checkPendingRequest(userId);
+                         }
+
+                    } else {
+                        // 認証済みユーザーの場合、役割をチェックし、管理者リンク表示とリダイレクトを行う
+                        await checkUserRole(userId);
+                    }
                 } else {
-                    // ログイン失敗...
-                    window.firebaseUser = null;
+                    // ユーザーがいない場合（初回起動時やログアウト後）
+                    // ここで匿名サインインを試みる（ただし、自動サインインによるループを防ぐため、ここでは行わない）
+                    // 代わりに、ユーザーが明示的に申請ボタンを押した時にサインインを試みるようにする
                 }
             });
+        }
+        
+        async function checkUserRole(uid) {
+            try {
+                const roleRef = ref(db, `user_roles/${uid}`);
+                const snapshot = await get(roleRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const isAdmin = userData.isAdmin === true;
+                    
+                    if (isAdmin) {
+                        adminLink.classList.remove('hidden');
+                    }
 
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            const errorMessage = document.getElementById('error-message');
-            if (errorMessage) {
-                errorMessage.textContent = 'システムの初期化に失敗しました。';
+                    // 役割が確認できたら、ログイン成功とみなしホームへリダイレクト
+                    const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                    window.location.href = window.location.origin + repoPath + '/index.html'; 
+                    
+                } else {
+                    // 役割データがない（Authユーザーだがメンバーではない）場合は、申請状況を確認
+                    checkPendingRequest(uid);
+                }
+            } catch (error) {
+                console.error("ユーザー役割チェックエラー:", error);
             }
         }
 
-        // ログイン機能のスクリプトを読み込む関数
-        function loadLoginScript() {
-            const script = document.createElement('script');
-            // ▼▼▼▼▼▼▼▼▼▼ 変更点（キャッシュ対策） ▼▼▼▼▼▼▼▼▼▼
-            // ?v=${Date.now()} を追加して、常に最新のファイルを読み込むようにします
-            script.src = `js/login-firebase.js?v=${Date.now()}`; 
-            script.type = 'module'; // moduleとして読み込む
-            document.body.appendChild(script);
+        async function checkPendingRequest(uid) {
+            // isAuthReadyがtrue、かつログインページがアクティブな場合のみ実行
+            if (!isAuthReady || !auth.currentUser || uid !== auth.currentUser.uid) {
+                return; 
+            }
+            
+            try {
+                // パス名を 'pending_users' に統一
+                const pendingRef = ref(db, `pending_users/${uid}`);
+                const snapshot = await get(pendingRef);
+
+                if (snapshot.exists()) {
+                    // 申請済みの場合、サインアップフォームのボタンとメッセージを変更
+                    const statusText = "参加申請済みです。管理者の承認をお待ちください。";
+                    applicationStatus.textContent = statusText;
+                    applicationStatus.classList.remove('hidden');
+                    document.getElementById('request-button').textContent = "申請済み";
+                    document.getElementById('request-button').disabled = true;
+                } else {
+                    // 未申請の場合
+                    applicationStatus.classList.add('hidden');
+                    document.getElementById('request-button').textContent = "登録を申請する";
+                    document.getElementById('request-button').disabled = false;
+                }
+            } catch (error) {
+                console.error("申請状況チェックエラー:", error);
+                
+                // Permission deniedエラーの場合も、ボタンを有効にして、申請はできるようにする
+                if (error.code && error.code.includes('PERMISSION_DENIED')) {
+                     applicationStatus.textContent = "申請状況の確認に失敗しました。このまま申請を送信してください。";
+                     applicationStatus.classList.remove('hidden');
+                }
+            }
         }
 
-    </script>
 
+        function setupUIListeners() {
+            // --- タブ切り替え機能 ---
+            const handleTabClick = (activeTab, inactiveTab, activeContent, inactiveContent) => {
+                activeTab.classList.add('active');
+                inactiveTab.classList.remove('active');
+                activeContent.classList.remove('hidden');
+                inactiveContent.classList.add('hidden');
+
+                if (activeTab.id === 'tab-signup' && isAuthReady && auth.currentUser) {
+                    // 入会申請タブに切り替えたとき、かつAuth準備完了している場合のみチェック
+                    checkPendingRequest(auth.currentUser.uid);
+                }
+            };
+
+            tabLogin.addEventListener('click', () => handleTabClick(tabLogin, tabSignup, loginContent, signupContent));
+            tabSignup.addEventListener('click', () => handleTabClick(tabSignup, tabLogin, signupContent, loginContent));
+
+
+            // --- ログインフォームの処理 ---
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const button = document.getElementById('login-button');
+                
+                loginMessage.textContent = 'ログイン処理中...';
+                loginMessage.className = 'text-sm text-yellow-400 text-center';
+                button.disabled = true;
+
+                try {
+                    // 既存の匿名セッションを置き換えて認証
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    // 役割チェックを行い、問題なければリダイレクトされる（checkUserRole内）
+                    await checkUserRole(userCredential.user.uid);
+
+                } catch (error) {
+                    console.error("ログイン失敗:", error);
+                    let msg = 'ログインに失敗しました。';
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        msg = 'メールアドレスまたはパスワードが正しくありません。';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        // ログインフォームでの too-many-requests エラーも表示
+                        msg = '連続した試行のため、しばらくしてから再度お試しください。';
+                    }
+                    loginMessage.textContent = msg;
+                    loginMessage.className = 'text-sm text-red-400 text-center';
+                    button.disabled = false;
+                }
+            });
+
+            // --- 入会申請フォームの処理 ---
+            joinRequestForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                let currentUid = auth.currentUser?.uid;
+                
+                // ★修正箇所: ユーザーIDがなければ、ここで匿名サインインを試みる
+                if (!currentUid) {
+                    requestMessage.textContent = '認証を試みています...';
+                    requestMessage.className = 'text-sm text-yellow-400 text-center';
+                    try {
+                        const anonUserCredential = await signInAnonymously(auth);
+                        currentUid = anonUserCredential.user.uid;
+                    } catch (error) {
+                        console.error("匿名サインイン失敗:", error);
+                        requestMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
+                        requestMessage.className = 'text-sm text-red-400 text-center';
+                        return;
+                    }
+                }
+
+                // 認証済みユーザーIDがない場合、処理を停止（通常は匿名サインインされているはず）
+                if (!currentUid) {
+                    requestMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
+                    return;
+                }
+                
+                const uid = currentUid;
+                const name = document.getElementById('request-name').value;
+                const email = document.getElementById('request-email').value;
+                const button = document.getElementById('request-button');
+                
+                requestMessage.textContent = '申請中...';
+                requestMessage.className = 'text-sm text-yellow-400 text-center';
+                button.disabled = true;
+
+                try {
+                    // Realtime Database に申請データを書き込む (pending_users)
+                    const requestRef = ref(db, `pending_users/${uid}`); 
+                    await set(requestRef, {
+                        email: email,
+                        name: name,
+                        createdAt: serverTimestamp(),
+                        status: 'pending' 
+                    });
+
+                    // 申請成功メッセージ
+                    requestMessage.textContent = '申請が完了しました。管理者の承認をお待ちください。';
+                    requestMessage.className = 'text-sm text-green-400 text-center';
+                    
+                    // フォームをリセットし、申請済み状態に更新
+                    joinRequestForm.reset();
+                    checkPendingRequest(uid);
+
+                } catch (error) {
+                    console.error("参加申請エラー:", error);
+                    requestMessage.textContent = `申請に失敗しました: ${error.message}`;
+                    requestMessage.className = 'text-sm text-red-400 text-center';
+                } finally {
+                    button.disabled = false;
+                }
+                setTimeout(() => { requestMessage.textContent = ''; }, 5000);
+            });
+        }
+
+        // アプリケーション開始
+        initializeAppCore();
+    </script>
 </body>
 </html>

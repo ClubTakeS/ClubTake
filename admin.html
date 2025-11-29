@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- CSSファイルを読み込みます -->
-    <!-- 注意: 外部CSSファイル（css/style.css）は、この環境ではロードされません。Tailwind設定をHTML内に含めます。 -->
+    <!-- この環境では外部CSSファイル（css/style.css）は、この環境ではロードされません。Tailwind設定をHTML内に含めます。 -->
 
     <script>
         // Tailwind CSSのカスタム設定
@@ -288,7 +288,7 @@
         // appId は config から取得します
         const appId = firebaseConfig.appId;
 
-        // グローバル変数として宣言
+        // グローバル変数
         let app, auth, db, currentUserId, currentUserToken;
         
         const pageError = document.getElementById('page-error-message');
@@ -387,9 +387,8 @@
                                 tableHtml += `<button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300" data-user-id="${userId}" data-new-role="true">昇格</button>`;
                             }
                             
-                            // ▼▼▼▼▼▼▼▼▼▼ 追加: メンバー削除ボタン ▼▼▼▼▼▼▼▼▼▼
+                            // メンバー削除ボタン
                             tableHtml += `<button type="button" class="member-delete-button text-red-500 hover:text-red-400 transition-colors duration-300" data-user-id="${userId}" data-user-email="${userData.email}">削除</button>`;
-                            // ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲
                         }
                         tableHtml += `</td></tr>`;
                     });
@@ -427,13 +426,18 @@
                     requestArray.forEach(request => {
                         const date = new Date(request.createdAt);
                         const formattedDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+                        
+                        // パスワードがDBに保存されているか確認
+                        const hasPassword = !!request.password;
+                        const passwordData = hasPassword ? `data-password="${request.password}"` : '';
+                        const passwordStatus = hasPassword ? '' : ' (パスワードなし)'; // パスワードがない場合の表示
 
                         tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.name || 'N/A'} <span class="text-gray-500 text-xs">(${request.key.substring(0, 8)}...)</span></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.email || 'N/A'}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.email || 'N/A'} ${passwordStatus}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button type="button" class="request-approve-button bg-brand-gold hover:bg-brand-gold-light text-black font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300 mr-2" data-user-id="${request.key}" data-email="${request.email}" data-name="${request.name}">承認</button>
+                                            <button type="button" class="request-approve-button bg-brand-gold hover:bg-brand-gold-light text-black font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300 mr-2" data-user-id="${request.key}" data-email="${request.email}" data-name="${request.name}" ${passwordData}>承認</button>
                                             <button type="button" class="request-reject-button bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300" data-user-id="${request.key}">拒否</button>
                                         </td>
                                       </tr>`;
@@ -785,31 +789,64 @@
                     const userId = newButton.dataset.userId;
                     const email = newButton.dataset.email;
                     const name = newButton.dataset.name;
+                    // ▼▼▼▼▼▼▼▼▼▼ 修正: パスワードを取得 ▼▼▼▼▼▼▼▼▼▼
+                    const password = newButton.dataset.password; 
+                    // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
 
                     requestMessage.textContent = '承認処理中...';
                     requestMessage.className = 'text-sm text-yellow-400 text-center';
 
+                    // パスワードチェック
+                    if (!password || password.length < 6) {
+                        requestMessage.textContent = 'エラー: パスワードがありません。申請者に再申請を求めてください。';
+                        requestMessage.className = 'text-sm text-red-400 text-center';
+                        return;
+                    }
+                    
                     try {
-                        // 1. users_roles に一般メンバーとして追加
-                        const userRoleRef = ref(db, `user_roles/${userId}`);
+                        // 1. 一時的なアプリと認証インスタンスを作成 (Authアカウント作成用)
+                        const tempAppName = 'temp-approve-app-' + Date.now();
+                        const tempApp = initializeApp(firebaseConfig, tempAppName);
+                        const tempAuth = getAuth(tempApp);
+
+                        // 2. Firebase Auth に正式なアカウントを作成
+                        const userCredential = await createUserWithEmailAndPassword(tempAuth, email, password);
+                        const newUserId = userCredential.user.uid;
+                        
+                        // 3. Authユーザーの作成が成功したら、元のuserId（匿名ID）に対応するRealtime DBの役割データを設定
+                        const userRoleRef = ref(db, `user_roles/${newUserId}`); 
                         await set(userRoleRef, {
                             email: email,
-                            isAdmin: false, // 新規メンバーは一般（isAdmin: false）として登録
-                            name: name || 'N/A' // 名前もあれば追加
+                            name: name || 'N/A',
+                            isAdmin: false // 新規メンバーは一般（isAdmin: false）として登録
                         });
                         
-                        // 2. pending_users から申請データを削除
+                        // 4. 承認処理後、一時認証インスタンスをログアウト（必須）
+                        await signOut(tempAuth);
+                        
+                        // 5. pending_users から申請データを削除 (承認済みなので)
                         const joinRequestRef = ref(db, `pending_users/${userId}`); 
                         await remove(joinRequestRef);
                         
-                        requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を承認し、メンバー登録しました。`;
+                        // 6. 元の匿名ID（userId）もログアウトさせてセッションをリセット
+                        // Auth側で対応ユーザーを削除したいが、Admin SDKが必要なため、ここではAuthユーザーのセッションをリセットする操作は行わず、
+                        // ユーザーに再ログインを促す形で対応。
+
+                        requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を承認し、正式なメンバー登録が完了しました。`;
                         requestMessage.className = 'text-sm text-green-400 text-center';
+
                     } catch (error) {
-                        console.error("承認失敗:", error);
-                        requestMessage.textContent = '承認処理に失敗しました。';
+                        console.error("承認失敗/Auth作成エラー:", error);
+                        let errMsg = '承認処理に失敗しました。';
+                        if (error.code === 'auth/email-already-in-use') {
+                            errMsg = 'エラー: このメールアドレスは既に使用されています。';
+                        } else if (error.code === 'auth/weak-password') {
+                             errMsg = 'エラー: パスワードが弱すぎます。';
+                        }
+                        requestMessage.textContent = errMsg;
                         requestMessage.className = 'text-sm text-red-400 text-center';
                     }
-                    setTimeout(() => { requestMessage.textContent = ''; }, 3000);
+                    setTimeout(() => { requestMessage.textContent = ''; }, 5000);
                 });
             });
             

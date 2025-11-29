@@ -57,12 +57,11 @@
                 <a href="login.html" class="text-white hover:text-brand-gold transition-colors duration-300">Members</a>
                 <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
                 <a href="feedback.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
-                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
             </div>
         </nav>
     </header>
 
-    <!-- メインコンテンツ（変更なし） -->
+    <!-- メインコンテンツ -->
     <main>
         <section class="relative flex items-center justify-center py-20 md:py-32" style="min-height: calc(100vh - 158px);">
             
@@ -99,9 +98,7 @@
                             <p id="error-message" class="text-sm text-red-400 text-center"></p>
                         </div>
                         <div class="text-right text-sm -mt-2">
-                            <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
                             <a href="password-reset.html" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
-                            <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
                                 パスワードをお忘れですか？
                             </a>
                         </div>
@@ -111,22 +108,22 @@
                                 ログイン
                             </button>
                         </div>
+                        
+                        <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（登録申請リンク） ▼▼▼▼▼▼▼▼▼▼ -->
+                        <div class="text-center text-sm mt-6 pt-6 border-t border-gray-700">
+                            <a href="signup.html" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
+                                新規会員登録（申請）はこちら
+                            </a>
+                        </div>
+                        <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+                        
                     </form>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- 共通フッター（変更なし） -->
-    <footer class="py-16 bg-black border-t border-gray-800">
-        <div class="container mx-auto px-6 text-center text-gray-400">
-            <div class="text-2xl font-serif-jp font-bold mb-4">
-                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                    ClubTake
-                </span>
-            </div>
-            <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
-            <p class="text-sm">TEL: 03-XXXX-XXXX</p>
+    <!-- 共通フッター -->
             <div class="flex justify-center space-x-6 my-6 text-sm">
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
@@ -137,10 +134,10 @@
         </div>
     </footer>
 
-    <!-- アニメーション用の js/main.js （変更なし） -->
+    <!-- アニメーション用の js/main.js -->
     <script src="js/main.js" defer></script>
     
-    <!-- ▼▼▼ここからが変更点▼▼▼ -->
+    <!-- Firebaseの機能を読み込むためのコード -->
     
     <!-- Firebaseの機能（ライブラリ）を読み込むためのコード -->
     <script type="module">
@@ -154,7 +151,7 @@
         import { getDatabase } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         
         
-        // ★★★変更★★★ あなたの「本物の」設定情報を貼り付けます
+        // あなたの「本物の」設定情報を貼り付けます
         const firebaseConfig = {
           apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
           authDomain: "clubtake-257af.firebaseapp.com",
@@ -168,7 +165,7 @@
         // ★★★変更★★★ Realtime Database の URL を config に追加します
         firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
 
-        // ★★★変更★★★ appId は config から取得します
+        // appId は config から取得します
         const appId = firebaseConfig.appId;
         // （`initialAuthToken` はもう使いません）
 
@@ -182,7 +179,6 @@
             // ログイン状態をブラウザに保存するように設定
             await setPersistence(auth, browserLocalPersistence);
 
-            // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
             // ログイン状態に関わらず、グローバル変数とスクリプトを準備します
             // （`js/login-firebase.js` が `auth` と `db` を見つけられるようにするため）
             window.firebaseApp = app;
@@ -190,13 +186,8 @@
             window.firebaseDb = db;
             
             // ログインスクリプトを読み込みます
-            // （`onAuthStateChanged` の外に移動しました）
             loadLoginScript();
-            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
-
-            // ★★★変更★★★ 自動で「匿名」ログイン処理を行「わない」ようにします
-            // await signInAnonymously(auth); // ← この行はコメントアウト（または削除）しておきます
 
             // ログイン状態を監視します
             onAuthStateChanged(auth, (user) => {
@@ -206,21 +197,8 @@
                     // （`window.firebaseApp` などは既に設定済み）
                     window.firebaseUser = user;
                     
-                    // 準備ができたので、ログインスクリプトを読み込みます
-                    // (js/login-firebase.js はステップ2で修正します)
-                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
-                    // （この呼び出しは上に移動したので、ここでは不要です）
-                    // if (!document.querySelector('script[src="js/login-firebase.js"]')) {
-                    //     loadLoginScript();
-                    // }
-                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-
                 } else {
                     // ログイン失敗...
-                    // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
-                    // このログは紛らわしいので削除（コメントアウト）します
-                    // console.log("Firebase anonymous auth failed.");
-                    // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
                     window.firebaseUser = null;
                 }
             });
@@ -239,13 +217,11 @@
             // ▼▼▼▼▼▼▼▼▼▼ 変更点（キャッシュ対策） ▼▼▼▼▼▼▼▼▼▼
             // ?v=${Date.now()} を追加して、常に最新のファイルを読み込むようにします
             script.src = `js/login-firebase.js?v=${Date.now()}`; 
-            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
             script.type = 'module'; // moduleとして読み込む
             document.body.appendChild(script);
         }
 
     </script>
-    <!-- ▲▲▲ここまでが変更点▲▲▲ -->
 
 </body>
 </html>

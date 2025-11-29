@@ -112,7 +112,7 @@
                 <div id="signup-form-content" class="tab-content hidden">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">新規入会申請</h2>
                     <form id="join-request-form" class="space-y-6">
-                        <p class="text-sm text-gray-400 text-center">管理者が承認後、メンバーとしてログイン可能になります。まずは申請を行ってください。</p>
+                        <p class="text-sm text-gray-400 text-center">管理者が承認後、メンバーとしてログイン可能になります。**希望するパスワード**もご入力ください。</p>
                         <div id="application-status" class="text-center text-yellow-400 text-sm hidden">
                             <!-- JSで申請状況を表示 -->
                         </div>
@@ -126,6 +126,13 @@
                             <input type="email" id="request-email" required
                                 class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
                         </div>
+                        <!-- ▼▼▼▼▼▼▼▼▼▼ 追加: パスワード入力欄 ▼▼▼▼▼▼▼▼▼▼ -->
+                        <div>
+                            <label for="request-password" class="block text-sm font-medium text-gray-300">希望パスワード (6文字以上)</label>
+                            <input type="password" id="request-password" required minlength="6"
+                                class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
+                        </div>
+                        <!-- ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲ -->
                         <div class="h-5">
                             <p id="request-message" class="text-sm text-red-400 text-center"></p>
                         </div>
@@ -213,8 +220,6 @@
                 setupAuthListener();
                 setupUIListeners();
 
-                // ページの読み込みが完了したら、匿名サインインを試みる (AuthListenerに依存)
-
             } catch (error) {
                 console.error("Firebase初期化エラー:", error);
             }
@@ -228,8 +233,7 @@
                 if (user) {
                     userId = user.uid;
                     if (user.isAnonymous) {
-                         // 匿名ユーザーの場合、認証済みユーザーによるサインインを妨げないようにする
-                         // 申請タブがアクティブな場合のみ、申請状況をチェック
+                         // 匿名ユーザーの場合、申請タブがアクティブな場合のみ、申請状況をチェック
                          if (tabSignup.classList.contains('active')) {
                              checkPendingRequest(userId);
                          }
@@ -240,8 +244,7 @@
                     }
                 } else {
                     // ユーザーがいない場合（初回起動時やログアウト後）
-                    // ここで匿名サインインを試みる（ただし、自動サインインによるループを防ぐため、ここでは行わない）
-                    // 代わりに、ユーザーが明示的に申請ボタンを押した時にサインインを試みるようにする
+                    // 何もしない。申請時に初めて匿名サインインを試みる
                 }
             });
         }
@@ -290,6 +293,11 @@
                     applicationStatus.classList.remove('hidden');
                     document.getElementById('request-button').textContent = "申請済み";
                     document.getElementById('request-button').disabled = true;
+                    
+                    // フォームの内容を申請内容で埋める (メールアドレスなど)
+                    document.getElementById('request-name').value = snapshot.val().name || '';
+                    document.getElementById('request-email').value = snapshot.val().email || '';
+                    document.getElementById('request-password').value = snapshot.val().password || ''; // パスワードも表示はしないが、データがあれば保持
                 } else {
                     // 未申請の場合
                     applicationStatus.classList.add('hidden');
@@ -372,6 +380,8 @@
                     try {
                         const anonUserCredential = await signInAnonymously(auth);
                         currentUid = anonUserCredential.user.uid;
+                        // 匿名サインインが成功した場合、onAuthStateChangedリスナーが発火し、
+                        // isAuthReadyがtrueになり、checkPendingRequestが実行される
                     } catch (error) {
                         console.error("匿名サインイン失敗:", error);
                         requestMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
@@ -389,11 +399,24 @@
                 const uid = currentUid;
                 const name = document.getElementById('request-name').value;
                 const email = document.getElementById('request-email').value;
+                // ▼▼▼▼▼▼▼▼▼▼ 修正: パスワードを取得 ▼▼▼▼▼▼▼▼▼▼
+                const password = document.getElementById('request-password').value;
+                // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
+                
                 const button = document.getElementById('request-button');
                 
                 requestMessage.textContent = '申請中...';
                 requestMessage.className = 'text-sm text-yellow-400 text-center';
                 button.disabled = true;
+
+                // ▼▼▼▼▼▼▼▼▼▼ 追加: パスワードの入力チェック ▼▼▼▼▼▼▼▼▼▼
+                if (password.length < 6) {
+                    requestMessage.textContent = 'パスワードは6文字以上で入力してください。';
+                    requestMessage.className = 'text-sm text-red-400 text-center';
+                    button.disabled = false;
+                    return;
+                }
+                // ▲▲▲▲▲▲▲▲▲▲ 追加 ▼▼▼▼▼▼▼▼▼▼
 
                 try {
                     // Realtime Database に申請データを書き込む (pending_users)
@@ -401,6 +424,7 @@
                     await set(requestRef, {
                         email: email,
                         name: name,
+                        password: password, // パスワードをDBに保存
                         createdAt: serverTimestamp(),
                         status: 'pending' 
                     });

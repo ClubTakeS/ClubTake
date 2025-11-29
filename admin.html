@@ -789,9 +789,7 @@
                     const userId = newButton.dataset.userId;
                     const email = newButton.dataset.email;
                     const name = newButton.dataset.name;
-                    // ▼▼▼▼▼▼▼▼▼▼ 修正: パスワードを取得 ▼▼▼▼▼▼▼▼▼▼
-                    const password = newButton.dataset.password; 
-                    // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
+                    const password = newButton.dataset.password; // パスワードを取得
 
                     requestMessage.textContent = '承認処理中...';
                     requestMessage.className = 'text-sm text-yellow-400 text-center';
@@ -813,7 +811,7 @@
                         const userCredential = await createUserWithEmailAndPassword(tempAuth, email, password);
                         const newUserId = userCredential.user.uid;
                         
-                        // 3. Authユーザーの作成が成功したら、元のuserId（匿名ID）に対応するRealtime DBの役割データを設定
+                        // 3. Authユーザーの作成が成功したら、Realtime DBの役割データを設定
                         const userRoleRef = ref(db, `user_roles/${newUserId}`); 
                         await set(userRoleRef, {
                             email: email,
@@ -828,21 +826,23 @@
                         const joinRequestRef = ref(db, `pending_users/${userId}`); 
                         await remove(joinRequestRef);
                         
-                        // 6. 元の匿名ID（userId）もログアウトさせてセッションをリセット
-                        // Auth側で対応ユーザーを削除したいが、Admin SDKが必要なため、ここではAuthユーザーのセッションをリセットする操作は行わず、
-                        // ユーザーに再ログインを促す形で対応。
-
+                        // 承認が完了したら、Authアカウントを新規に作成したことをユーザーに通知
                         requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を承認し、正式なメンバー登録が完了しました。`;
                         requestMessage.className = 'text-sm text-green-400 text-center';
 
                     } catch (error) {
                         console.error("承認失敗/Auth作成エラー:", error);
                         let errMsg = '承認処理に失敗しました。';
+                        
+                        // エラーコードに基づいて具体的なメッセージを表示
                         if (error.code === 'auth/email-already-in-use') {
-                            errMsg = 'エラー: このメールアドレスは既に使用されています。';
+                            errMsg = 'エラー: このメールアドレスは既に登録済みです。';
                         } else if (error.code === 'auth/weak-password') {
-                             errMsg = 'エラー: パスワードが弱すぎます。';
+                             errMsg = 'エラー: パスワードが弱すぎます。（管理画面からこのエラーが出る場合は、申請者の入力ミスです）';
+                        } else {
+                            errMsg = `承認処理に失敗しました: ${error.message}`;
                         }
+                        
                         requestMessage.textContent = errMsg;
                         requestMessage.className = 'text-sm text-red-400 text-center';
                     }

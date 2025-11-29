@@ -90,7 +90,7 @@
                 <!-- ▲▲▲▲▲▲▲▲▲▲ 新規入会希望者一覧セクション ▲▲▲▲▲▲▲▲▲▲ -->
 
 
-                <!-- メンバー一覧表示エリア (変更なし) -->
+                <!-- メンバー一覧表示エリア -->
                 <div id="member-list-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
                         メンバー一覧
@@ -106,7 +106,7 @@
                         <!-- ここに JavaScript によってテーブルが動的に挿入されます -->
                     </div>
                     
-                    <!-- 権限変更のメッセージ表示エリア -->
+                    <!-- 権限変更・削除のメッセージ表示エリア -->
                     <div class="h-5 mt-4">
                         <p id="list-message" class="text-sm text-green-400 text-center"></p>
                     </div>
@@ -268,7 +268,7 @@
         // Firebaseのログイン機能（Auth）を読み込みます
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // Realtime Database の機能を読み込みます (push, serverTimestamp, query, orderByChild を追加)
+        // Realtime Database の機能を読み込みます (push, serverTimestamp, query, orderByChild, remove を追加/維持)
         import { getDatabase, ref, set, get, onValue, update, remove, push, serverTimestamp, query, orderByChild } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         
         // あなたの「本物の」設定情報を貼り付けます
@@ -337,9 +337,8 @@
                         loadAndDisplayMembers();
                         // フィードバックの読み込みを開始します
                         loadAndDisplayFeedback();
-                        // ▼▼▼▼▼▼▼▼▼▼ 修正点: 新規入会希望者の読み込みを開始 ▼▼▼▼▼▼▼▼▼▼
+                        // 新規入会希望者の読み込みを開始
                         loadAndDisplayJoinRequests();
-                        // ▲▲▲▲▲▲▲▲▲▲ 修正点 ▲▲▲▲▲▲▲▲▲▲
 
                     } else {
                         // 管理者権限なし
@@ -376,15 +375,21 @@
                         // メールアドレスが存在しないユーザー（例：匿名ユーザー）は表示しない
                         if (!userData.email) return; 
 
-                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td><td class="px-6 py-4 whitespace-nowrap text-sm">${userData.isAdmin ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-gold-dark text-black">管理者</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium">`;
+                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td><td class="px-6 py-4 whitespace-nowrap text-sm">${userData.isAdmin ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-gold-dark text-black">管理者</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-2">`;
+                        
                         if (isCurrentUser) {
                             tableHtml += `<span class="text-xs text-gray-500">（自分）</span>`;
-                        } else if (userData.isAdmin) {
-                            // 降格ボタン
-                            tableHtml += `<button type="button" class="role-change-button text-gray-400 hover:text-white transition-colors duration-300" data-user-id="${userId}" data-new-role="false">一般に降格</button>`;
                         } else {
-                             // 昇格ボタン
-                             tableHtml += `<button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300" data-user-id="${userId}" data-new-role="true">管理者に昇格</button>`;
+                            // 昇格・降格ボタン
+                            if (userData.isAdmin) {
+                                tableHtml += `<button type="button" class="role-change-button text-gray-400 hover:text-white transition-colors duration-300" data-user-id="${userId}" data-new-role="false">降格</button>`;
+                            } else {
+                                tableHtml += `<button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300" data-user-id="${userId}" data-new-role="true">昇格</button>`;
+                            }
+                            
+                            // ▼▼▼▼▼▼▼▼▼▼ 追加: メンバー削除ボタン ▼▼▼▼▼▼▼▼▼▼
+                            tableHtml += `<button type="button" class="member-delete-button text-red-500 hover:text-red-400 transition-colors duration-300" data-user-id="${userId}" data-user-email="${userData.email}">削除</button>`;
+                            // ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲
                         }
                         tableHtml += `</td></tr>`;
                     });
@@ -404,9 +409,8 @@
         
         // --- 新規入会希望者を読み込む関数 ---
         function loadAndDisplayJoinRequests() {
-            // ▼▼▼▼▼▼▼▼▼▼ 修正: パス名をセキュリティルールに合わせて 'pending_users' に変更します ▼▼▼▼▼▼▼▼▼▼
+            // パス名をセキュリティルールに合わせて 'pending_users' に変更します
             const requestsRef = ref(db, 'pending_users'); 
-            // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
             
             onValue(requestsRef, (snapshot) => {
                 if (snapshot.exists()) {
@@ -424,7 +428,6 @@
                         const date = new Date(request.createdAt);
                         const formattedDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
 
-                        // ▼▼▼▼▼▼▼▼▼▼ 修正: テンプレートリテラル内の閉じられていないはずの括弧を修正 ▼▼▼▼▼▼▼▼▼▼
                         tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.name || 'N/A'} <span class="text-gray-500 text-xs">(${request.key.substring(0, 8)}...)</span></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.email || 'N/A'}</td>
@@ -434,7 +437,6 @@
                                             <button type="button" class="request-reject-button bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300" data-user-id="${request.key}">拒否</button>
                                         </td>
                                       </tr>`;
-                        // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
                     });
 
                     tableHtml += `</tbody></table>`;
@@ -706,31 +708,65 @@
         
         // --- イベントリスナーの追加 ---
         function addEventListenersToButtons() {
-            // メンバー昇格・降格ボタン
-            document.querySelectorAll('.role-change-button').forEach(button => {
+            // メンバー昇格・降格ボタンと削除ボタン
+            document.querySelectorAll('.role-change-button, .member-delete-button').forEach(button => {
                 // 二重登録防止のため、一旦クローンして元のボタンと置き換える
                 const newButton = button.cloneNode(true);
                 button.parentNode.replaceChild(newButton, button);
-
+                
                 newButton.addEventListener('click', async () => {
                     const userId = newButton.dataset.userId;
-                    const newRole = newButton.dataset.newRole === 'true';
-                    
                     const listMessage = document.getElementById('list-message');
-                    listMessage.textContent = '権限変更中...';
-                    listMessage.className = 'text-sm text-yellow-400 text-center';
+                    
+                    if (newButton.classList.contains('role-change-button')) {
+                        // 役割変更処理
+                        const newRole = newButton.dataset.newRole === 'true';
+                        
+                        listMessage.textContent = '権限変更中...';
+                        listMessage.className = 'text-sm text-yellow-400 text-center';
 
-                    try {
-                        const roleRef = ref(db, `user_roles/${userId}`);
-                        await update(roleRef, { isAdmin: newRole });
-                        listMessage.textContent = `権限を ${newRole ? '管理者' : '一般'} に変更しました。`;
-                        listMessage.className = 'text-sm text-green-400 text-center';
-                    } catch (error) {
-                        console.error("権限変更失敗:", error);
-                        listMessage.textContent = '権限変更に失敗しました。';
-                        listMessage.className = 'text-sm text-red-400 text-center';
+                        try {
+                            const roleRef = ref(db, `user_roles/${userId}`);
+                            await update(roleRef, { isAdmin: newRole });
+                            listMessage.textContent = `権限を ${newRole ? '管理者' : '一般'} に変更しました。`;
+                            listMessage.className = 'text-sm text-green-400 text-center';
+                        } catch (error) {
+                            console.error("権限変更失敗:", error);
+                            listMessage.textContent = '権限変更に失敗しました。';
+                            listMessage.className = 'text-sm text-red-400 text-center';
+                        }
+                        setTimeout(() => { listMessage.textContent = ''; }, 3000);
+
+                    } else if (newButton.classList.contains('member-delete-button')) {
+                        // メンバー削除処理
+                        const userEmail = newButton.dataset.userEmail;
+                        
+                        // 確認メッセージをセット（alert/confirmは使用禁止のため）
+                        if (!window.confirm(`本当にメンバー ${userEmail} を削除しますか？\n（この操作は元に戻せません）`)) {
+                            return;
+                        }
+
+                        listMessage.textContent = '削除処理中...';
+                        listMessage.className = 'text-sm text-yellow-400 text-center';
+                        
+                        try {
+                            // Realtime Database から役割データを削除
+                            const roleRef = ref(db, `user_roles/${userId}`);
+                            await remove(roleRef);
+                            
+                            // ★重要★ Authアカウントはサーバーサイドでのみ削除可能です
+                            console.warn(`Realtime DBから役割データ（UID: ${userId}）を削除しました。`);
+                            console.warn(`Firebase Authアカウント自体は残っています。Authアカウントを完全に削除するには、Firebase Admin SDK（Cloud Functions等）を使用する必要があります。`);
+
+                            listMessage.textContent = `メンバー ${userEmail} の役割を削除しました。`;
+                            listMessage.className = 'text-sm text-green-400 text-center';
+                        } catch (error) {
+                            console.error("メンバー削除失敗:", error);
+                            listMessage.textContent = 'メンバー削除に失敗しました。';
+                            listMessage.className = 'text-sm text-red-400 text-center';
+                        }
+                        setTimeout(() => { listMessage.textContent = ''; }, 5000);
                     }
-                    setTimeout(() => { listMessage.textContent = ''; }, 3000);
                 });
             });
         }

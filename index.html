@@ -80,7 +80,7 @@
                 <div class="max-w-3xl mx-auto text-center md:text-left">
                     <h2 class="text-3xl md:text-4xl font-serif-jp mb-6">
                         <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                            理知の原則
+                            叡信の原則
                         </span>
                     </h2>
                     <p class="text-base leading-relaxed text-gray-300">
@@ -97,7 +97,7 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl md:text-4xl font-serif-jp text-center mb-16">
                     <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                        ClubTakeの奥義
+                        ClubTakeの神髄
                     </span>
                 </h2>
                 <div class="grid md:grid-cols-3 gap-10">
@@ -136,13 +136,47 @@
                                 </span>
                             </h3>
                             <p class="text-sm text-gray-300 leading-relaxed">
-                                2025年7月9日。私たちは社会的な因縁を脇に置き、クラブの「理知」の原則にのみ従うことを誓いました。
+                                2025年7月9日。私たちは社会的な因縁を脇に置き、クラブの「叡信」の原則にのみ従うことを誓いました。
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせセクションの追加） ▼▼▼▼▼▼▼▼▼▼ -->
+        <!-- 1. トップページ: セクション5 (お知らせ) -->
+        <section id="news-section" class="py-20 md:py-32 bg-black fade-in">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-serif-jp text-center mb-16">
+                    <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                        お知らせ
+                    </span>
+                </h2>
+                
+                <!-- 読み込み中メッセージ -->
+                <div id="news-loading-message" class="text-center text-gray-400">
+                    お知らせを読み込んでいます...
+                </div>
+                
+                <!-- お知らせ一覧が挿入されるコンテナ -->
+                <div id="news-list-container" class="max-w-3xl mx-auto space-y-6">
+                    <!-- ここにJavaScriptによってお知らせが挿入されます -->
+                    
+                    <!-- (表示例)
+                    <a href="#" class="block p-6 bg-black border border-gray-800 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300 group">
+                        <p class="text-sm text-gray-500 mb-1">
+                            <time>2025年11月29日</time> | <span class="font-medium text-brand-gold-light">催事</span>
+                        </p>
+                        <h3 class="text-lg font-serif-jp text-gray-200 group-hover:text-brand-gold-light transition-colors duration-300">
+                            一般公開のお知らせタイトル
+                        </h3>
+                    </a>
+                    -->
+                </div>
+            </div>
+        </section>
+        <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
 
     </main>
 
@@ -156,8 +190,8 @@
                 </span>
             </div>
             <!-- 住所など -->
-            <p class="text-sm">9 Sherringford Square, London SE11, United Kingdom</p>
-            <p class="text-sm">TEL: (605) 475-6961</p>
+            <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
+            <p class="text-sm">TEL: 03-XXXX-XXXX</p>
             <!-- フッターナビ -->
             <div class="flex justify-center space-x-6 my-6 text-sm">
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
@@ -173,8 +207,120 @@
     <!-- アニメーションのコードを外部ファイル(js/main.js)から読み込みます -->
     <script src="js/main.js" defer></script>
 
+    <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（Firebase読み込みスクリプトの追加） ▼▼▼▼▼▼▼▼▼▼ -->
+    <script type="module">
+        // Firebaseの基本的な機能（App）を読み込みます
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Realtime Database の機能を読み込みます
+        import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // あなたの「本物の」設定情報を貼り付けます
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
+        
+        // Realtime Database の URL を config に追加します
+        firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
+
+        let app, db;
+        const listContainer = document.getElementById('news-list-container');
+        const loadingMessage = document.getElementById('news-loading-message');
+
+        try {
+            // Firebaseを初期化します
+            app = initializeApp(firebaseConfig);
+            // Realtime Database を初期化します
+            db = getDatabase(app);
+            
+            // お知らせの読み込みを開始します
+            loadPublicNews();
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            if(loadingMessage) loadingMessage.textContent = "システムの初期化に失敗しました。";
+        }
+
+        /**
+         * 一般公開用お知らせを読み込んで表示する関数
+         */
+        function loadPublicNews() {
+            const newsRef = ref(db, 'public_news');
+            
+            // createdAt（作成日時）で並び替え、最新の3件を取得するクエリ
+            // （Realtime DBは昇順しかサポートしないため、limitToLast(3) で「最後（最新）の3件」を取得します）
+            const newsQuery = query(newsRef, orderByChild('createdAt'), limitToLast(3));
+
+            // onValue を使って、データベースの変更をリアルタイムで監視します
+            onValue(newsQuery, (snapshot) => {
+                if (snapshot.exists()) {
+                    const news = snapshot.val();
+                    
+                    // 読み込みメッセージを非表示に
+                    loadingMessage.style.display = 'none';
+                    // 既存のリストをクリア
+                    listContainer.innerHTML = '';
+                    
+                    // データベースから取得したデータを配列に変換し、「新しい順」に並び替える
+                    const newsArray = Object.entries(news)
+                        .map(([key, value]) => ({ key, ...value })) // オブジェクトを配列に
+                        .sort((a, b) => b.createdAt - a.createdAt); // createdAt の降順（新しい順）でソート
+                    
+                    
+                    // 並び替えた配列を使って、お知らせのHTMLを組み立てる
+                    newsArray.forEach(post => {
+                        
+                        // タイムスタンプ（数字）を「YYYY年MM月DD日」の形式に変換
+                        const date = new Date(post.createdAt);
+                        const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                        
+                        // XSS（クロスサイトスクリプティング）対策：
+                        // ユーザーが入力した可能性のあるテキストを安全に表示するための関数
+                        const escapeHTML = (str) => str.replace(/[&<>"']/g, (match) => {
+                            return {
+                              '&': '&amp;',
+                              '<': '&lt;',
+                              '>': '&gt;',
+                              '"': '&quot;',
+                              "'": '&#39;'
+                            }[match];
+                        });
+                        
+                        // カテゴリに応じた色を決定
+                        const categoryClass = post.category === '催事' ? 'text-brand-gold-light' : 'text-gray-400';
+
+                        const newsItem = document.createElement('a');
+                        newsItem.href = "#"; // (将来的には詳細ページへのリンク)
+                        newsItem.className = "block p-6 bg-black border border-gray-800 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300 group";
+                        
+                        newsItem.innerHTML = `
+                            <p class="text-sm text-gray-500 mb-1">
+                                <time>${formattedDate}</time> | <span class="font-medium ${categoryClass}">${escapeHTML(post.category)}</span>
+                            </p>
+                            <h3 class="text-lg font-serif-jp text-gray-200 group-hover:text-brand-gold-light transition-colors duration-300">
+                                ${escapeHTML(post.title)}
+                            </h3>
+                        `;
+                        
+                        listContainer.appendChild(newsItem);
+                    });
+
+                } else {
+                    // お知らせが一件もない場合
+                    loadingMessage.textContent = '現在、お知らせはありません。';
+                }
+            }, (error) => {
+                console.error("お知らせの読み込み失敗:", error);
+                loadingMessage.textContent = 'お知らせの読み込みに失敗しました。';
+            });
+        }
+    </script>
+    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+
 </body>
-
 </html>
-
-

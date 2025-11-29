@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClubTake - ホーム</title>
+    <title>ClubTake - フィードバック</title>
     <!-- Tailwind CSS を読み込みます -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
@@ -35,6 +35,8 @@
     </script>
 </head>
 <body class="bg-black text-gray-200 font-sans">
+
+    <!-- 共通ヘッダー -->
     <header class="sticky top-0 z-50 w-full bg-black bg-opacity-80 backdrop-blur-sm shadow-lg border-b border-gray-800">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <!-- ロゴ -->
@@ -45,175 +47,118 @@
             </div>
             <!-- ナビゲーション（PC用） -->
             <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
-                <a href="index.html" class="text-white hover:text-brand-gold transition-colors duration-300">Home</a>
+                <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
                 <a href="login.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Members</a>
-                <a href="#" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼ -->
+                <a href="feedback.html" class="text-white hover:text-brand-gold transition-colors duration-300">Feedback</a>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
             </div>
         </nav>
     </header>
 
     <!-- メインコンテンツ -->
     <main>
-
-        <!-- 1. トップページ: セクション1 (ファーストビュー) -->
-        <section class="h-screen min-h-[700px] relative flex items-center justify-center text-center text-white overflow-hidden">
-            <!-- 背景画像（コンテナは残し、中のプレースホルダーを削除） -->
-            <div class="absolute inset-0 bg-cover bg-center z-0 bg-gray-900">
-                <!-- 空のボックスを削除 -->
-            </div>
-            <!-- 背景のオーバーレイ（画像を暗くして文字を読みやすくする） -->
-            <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
-            <!-- 中央配置テキスト -->
-            <div class="relative z-20 p-8 space-y-4">
-                <h1 class="text-4xl md:text-6xl font-serif-jp font-bold hero-text-1" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
-                    ようこそ、ClubTakeへ。
-                </h1>
-                <p class="text-xl md:text-3xl font-serif-jp hero-text-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
-                    理知が交差し、中立性が守られる場所。
-                </p>
-            </div>
-        </section>
-
-        <!-- 1. トップページ: セクション2 (ご挨拶) -->
-        <section class="py-20 md:py-32 bg-black fade-in"> <!-- fade-inクラスを追加 -->
+        <section class="relative flex items-center justify-center py-20 md:py-32" style="min-height: calc(100vh - 158px);">
+            
             <div class="container mx-auto px-6">
-                <div class="max-w-3xl mx-auto text-center md:text-left">
-                    <h2 class="text-3xl md:text-4xl font-serif-jp mb-6">
+                <div class="max-w-md mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 fade-in is-visible">
+                    
+                    <h2 class="text-3xl font-serif-jp text-center mb-8">
                         <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                            叡信の原則
+                            フィードバック
                         </span>
                     </h2>
-                    <p class="text-base leading-relaxed text-gray-300">
-                        CLUB Takeは、高度な専門知識を持つ人々が、社会的な立場を超えて集う場所です。
-                        当クラブへの入会は過去の実績ではなく、「クラブのルールを尊重し、真のプロフェッショナルとして行動する」という決意によってのみ決まります。
-                        ここでは、あらゆる敵対行為が禁じられ、絶対的な中立性が保障されます。外部の混乱から隔離されたこの空間で、信頼できる情報交換と協力のひとときをお過ごしください。
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 1. トップページ: セクション3 (クラブの特徴) -->
-        <section class="py-20 md:py-32 bg-black fade-in"> <!-- fade-inクラスを追加 -->
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl md:text-4xl font-serif-jp text-center mb-16">
-                    <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                        ClubTakeの神髄
-                    </span>
-                </h2>
-                <div class="grid md:grid-cols-3 gap-10">
-                    <!-- 特徴カード 1: 空間 -->
-                    <div class="bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif-jp mb-3">
-                                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                                    洗練された静謐
-                                </span>
-                            </h3>
-                            <p class="text-sm text-gray-300 leading-relaxed">
-                                外部の混乱から隔離された、絶対的な中立空間。ここでは、ただ知的な交流だけが許されます。
-                            </p>
-                        </div>
-                    </div>
-                    <!-- 特徴カード 2: サービス -->
-                    <div class="bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif-jp mb-3">
-                                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                                    絶対的中立性
-                                </span>
-                            </h3>
-                            <p class="text-sm text-gray-300 leading-relaxed">
-                                利害が対立する組織のメンバーであっても、ここでは互いへの敬意と中立を維持することが求められます。
-                            </p>
-                        </div>
-                    </div>
-                    <!-- 特徴カード 3: 伝統 -->
-                    <div class="bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                        <div class="p-8">
-                            <h3 class="text-2xl font-serif-jp mb-3">
-                                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                                    独立の誓い
-                                </span>
-                            </h3>
-                            <p class="text-sm text-gray-300 leading-relaxed">
-                                2025年7月9日。私たちは社会的な因縁を脇に置き、クラブの「叡信」の原則にのみ従うことを誓いました。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせセクションの追加） ▼▼▼▼▼▼▼▼▼▼ -->
-        <!-- 1. トップページ: セクション5 (お知らせ) -->
-        <section id="news-section" class="py-20 md:py-32 bg-black fade-in">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl md:text-4xl font-serif-jp text-center mb-16">
-                    <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                        お知らせ
-                    </span>
-                </h2>
-                
-                <!-- 読み込み中メッセージ -->
-                <div id="news-loading-message" class="text-center text-gray-400">
-                    お知らせを読み込んでいます...
-                </div>
-                
-                <!-- お知らせ一覧が挿入されるコンテナ -->
-                <div id="news-list-container" class="max-w-3xl mx-auto space-y-6">
-                    <!-- ここにJavaScriptによってお知らせが挿入されます -->
                     
-                    <!-- (表示例)
-                    <a href="#" class="block p-6 bg-black border border-gray-800 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300 group">
-                        <p class="text-sm text-gray-500 mb-1">
-                            <time>2025年11月29日</time> | <span class="font-medium text-brand-gold-light">催事</span>
-                        </p>
-                        <h3 class="text-lg font-serif-jp text-gray-200 group-hover:text-brand-gold-light transition-colors duration-300">
-                            一般公開のお知らせタイトル
-                        </h3>
-                    </a>
-                    -->
+                    <p class="text-center text-sm text-gray-300 mb-6">
+                        サイトに関するご意見・ご感想をお寄せください。
+                    </p>
+
+                    <div id="feedback-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300">
+                                お名前 (任意)
+                            </label>
+                            <div class="mt-1">
+                                <input id="name" name="name" type="text"
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300">
+                                メールアドレス (任意)
+                            </label>
+                            <div class="mt-1">
+                                <input id="email" name="email" type="email" autocomplete="email"
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="content" class="block text-sm font-medium text-gray-300">
+                                ご意見・ご感想 (必須)
+                            </label>
+                            <div class="mt-1">
+                                <textarea id="content" name="content" rows="4" required
+                                    class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="h-5">
+                            <!-- メッセージ表示エリア -->
+                            <p id="message" class="text-sm text-green-400 text-center"></p>
+                        </div>
+
+                        <div>
+                            <button id="send-button" type="button"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-brand-gold transition-all duration-300">
+                                送信
+                            </button>
+                        </div>
+                        
+                        <div class="text-center text-sm mt-4">
+                            <a href="index.html" class="font-medium text-brand-gold hover:text-brand-gold-light transition-colors duration-300">
+                                ホームに戻る
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
-        <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
-
     </main>
 
     <!-- 共通フッター -->
     <footer class="py-16 bg-black border-t border-gray-800">
         <div class="container mx-auto px-6 text-center text-gray-400">
-            <!-- ロゴ -->
             <div class="text-2xl font-serif-jp font-bold mb-4">
                 <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
                     ClubTake
                 </span>
             </div>
-            <!-- 住所など -->
             <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
             <p class="text-sm">TEL: 03-XXXX-XXXX</p>
-            <!-- フッターナビ -->
             <div class="flex justify-center space-x-6 my-6 text-sm">
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
                 <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
             </div>
-            <!-- コピーライト -->
             <p class="text-xs text-gray-500 mt-8">
                 &copy; 2025 ClubTake. All Rights Reserved.
             </p>
         </div>
     </footer>
 
-    <!-- アニメーションのコードを外部ファイル(js/main.js)から読み込みます -->
+    <!-- アニメーション用の js/main.js （変更なし） -->
     <script src="js/main.js" defer></script>
-
-    <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（Firebase読み込みスクリプトの追加） ▼▼▼▼▼▼▼▼▼▼ -->
+    
+    <!-- Firebaseの機能を読み込むためのコード -->
     <script type="module">
         // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Firebaseのログイン機能（Auth）を読み込みます
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // Realtime Database の機能を読み込みます
-        import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
+        import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
         // あなたの「本物の」設定情報を貼り付けます
         const firebaseConfig = {
           apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
@@ -227,105 +172,87 @@
         
         // Realtime Database の URL を config に追加します
         firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
-
-        let app, db;
-        const listContainer = document.getElementById('news-list-container');
-        const loadingMessage = document.getElementById('news-loading-message');
+        
+        let app, auth, db;
+        let currentUserId = 'anonymous'; // 初期値
+        const messageEl = document.getElementById('message');
+        const sendButton = document.getElementById('send-button');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const contentInput = document.getElementById('content');
 
         try {
             // Firebaseを初期化します
             app = initializeApp(firebaseConfig);
-            // Realtime Database を初期化します
+            auth = getAuth(app);
             db = getDatabase(app);
             
-            // お知らせの読み込みを開始します
-            loadPublicNews();
+            // このページは誰でも使えるように「匿名」でログインします
+            await signInAnonymously(auth);
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // 匿名ユーザーIDを取得
+                    currentUserId = user.uid;
+                    console.log("匿名ログイン成功:", currentUserId);
+                } else {
+                    console.log("匿名ログインに失敗しました。");
+                }
+            });
+
+            // 送信ボタンの機能を設定
+            if (sendButton) {
+                sendButton.addEventListener('click', async () => {
+                    const name = nameInput.value;
+                    const email = emailInput.value;
+                    const content = contentInput.value;
+
+                    if (!content) {
+                        messageEl.textContent = 'ご意見・ご感想を入力してください。';
+                        messageEl.className = 'text-sm text-red-400 text-center';
+                        return;
+                    }
+
+                    messageEl.textContent = '送信中...';
+                    messageEl.className = 'text-sm text-yellow-400 text-center';
+                    sendButton.disabled = true;
+
+                    try {
+                        // Firebase にフィードバックを送信 (pushで新しいIDを自動生成)
+                        const feedbackRef = ref(db, 'feedback');
+                        await push(feedbackRef, {
+                            name: name,
+                            email: email,
+                            content: content,
+                            createdAt: serverTimestamp(), // Firebaseサーバーの時刻を保存
+                            userId: currentUserId // 匿名ユーザーのIDを保存
+                        });
+                        
+                        messageEl.textContent = 'ご意見ありがとうございます。送信しました。';
+                        messageEl.className = 'text-sm text-green-400 text-center';
+                        // フォームをクリア
+                        nameInput.value = '';
+                        emailInput.value = '';
+                        contentInput.value = ''; 
+                        sendButton.disabled = false;
+
+                    } catch (error) {
+                        console.error("フィードバック送信失敗:", error);
+                        messageEl.textContent = '送信に失敗しました。';
+                        messageEl.className = 'text-sm text-red-400 text-center';
+                        sendButton.disabled = false;
+                    }
+                });
+            }
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
-            if(loadingMessage) loadingMessage.textContent = "システムの初期化に失敗しました。";
-        }
-
-        /**
-         * 一般公開用お知らせを読み込んで表示する関数
-         */
-        function loadPublicNews() {
-            const newsRef = ref(db, 'public_news');
-            
-            // createdAt（作成日時）で並び替え、最新の3件を取得するクエリ
-            // （Realtime DBは昇順しかサポートしないため、limitToLast(3) で「最後（最新）の3件」を取得します）
-            const newsQuery = query(newsRef, orderByChild('createdAt'), limitToLast(3));
-
-            // onValue を使って、データベースの変更をリアルタイムで監視します
-            onValue(newsQuery, (snapshot) => {
-                if (snapshot.exists()) {
-                    const news = snapshot.val();
-                    
-                    // 読み込みメッセージを非表示に
-                    loadingMessage.style.display = 'none';
-                    // 既存のリストをクリア
-                    listContainer.innerHTML = '';
-                    
-                    // データベースから取得したデータを配列に変換し、「新しい順」に並び替える
-                    const newsArray = Object.entries(news)
-                        .map(([key, value]) => ({ key, ...value })) // オブジェクトを配列に
-                        .sort((a, b) => b.createdAt - a.createdAt); // createdAt の降順（新しい順）でソート
-                    
-                    
-                    // 並び替えた配列を使って、お知らせのHTMLを組み立てる
-                    newsArray.forEach(post => {
-                        
-                        // タイムスタンプ（数字）を「YYYY年MM月DD日」の形式に変換
-                        const date = new Date(post.createdAt);
-                        const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-                        
-                        // XSS（クロスサイトスクリプティング）対策：
-                        // ユーザーが入力した可能性のあるテキストを安全に表示するための関数
-                        const escapeHTML = (str) => str.replace(/[&<>"']/g, (match) => {
-                            return {
-                              '&': '&amp;',
-                              '<': '&lt;',
-                              '>': '&gt;',
-                              '"': '&quot;',
-                              "'": '&#39;'
-                            }[match];
-                        });
-                        
-                        // カテゴリに応じた色を決定
-                        const categoryClass = post.category === '催事' ? 'text-brand-gold-light' : 'text-gray-400';
-
-                        const newsItem = document.createElement('a');
-                        
-                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
-                        // href="#" を、詳細ページへのリンク（?id=...）に変更します
-                        newsItem.href = `news-detail.html?id=${escapeHTML(post.key)}`; 
-                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-                        
-                        newsItem.className = "block p-6 bg-black border border-gray-800 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300 group";
-                        
-                        newsItem.innerHTML = `
-                            <p class="text-sm text-gray-500 mb-1">
-                                <time>${formattedDate}</time> | <span class="font-medium ${categoryClass}">${escapeHTML(post.category)}</span>
-                            </p>
-                            <h3 class="text-lg font-serif-jp text-gray-200 group-hover:text-brand-gold-light transition-colors duration-300">
-                                ${escapeHTML(post.title)}
-                            </h3>
-                        `;
-                        
-                        listContainer.appendChild(newsItem);
-                    });
-
-                } else {
-                    // お知らせが一件もない場合
-                    loadingMessage.textContent = '現在、お知らせはありません。';
-                }
-            }, (error) => {
-                console.error("お知らせの読み込み失敗:", error);
-                loadingMessage.textContent = 'お知らせの読み込みに失敗しました。';
-            });
+            if (messageEl) {
+                messageEl.textContent = 'システムの初期化に失敗しました。';
+                messageEl.className = 'text-sm text-red-400 text-center';
+            }
         }
     </script>
-    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
 
 </body>
 </html>

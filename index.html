@@ -295,7 +295,12 @@
                         const categoryClass = post.category === '催事' ? 'text-brand-gold-light' : 'text-gray-400';
 
                         const newsItem = document.createElement('a');
-                        newsItem.href = "#"; // (将来的には詳細ページへのリンク)
+                        
+                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
+                        // href="#" を、詳細ページへのリンク（?id=...）に変更します
+                        newsItem.href = `news-detail.html?id=${escapeHTML(post.key)}`; 
+                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+                        
                         newsItem.className = "block p-6 bg-black border border-gray-800 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300 group";
                         
                         newsItem.innerHTML = `

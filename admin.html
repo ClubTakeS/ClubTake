@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- CSSファイルを読み込みます -->
-    <link rel="stylesheet" href="css/style.css">
+    <!-- 注意: 外部CSSファイル（css/style.css）は、この環境ではロードされません。Tailwind設定をHTML内に含めます。 -->
 
     <script>
         // Tailwind CSSのカスタム設定
@@ -69,7 +69,27 @@
                 
                 <div id="page-error-message" class="max-w-4xl mx-auto text-center text-red-400 text-lg mb-8"></div>
                 
-                
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 修正点: 新規入会希望者一覧セクションを追加 ▼▼▼▼▼▼▼▼▼▼ -->
+                <div id="join-requests-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
+                    <h2 class="text-2xl font-serif-jp text-center mb-8">
+                        新規入会希望者
+                    </h2>
+                    
+                    <div id="requests-loading-message" class="text-center text-gray-400">
+                        申請情報を読み込んでいます...
+                    </div>
+                    
+                    <div id="join-requests-container" class="overflow-x-auto">
+                        <!-- ここに JavaScript によってテーブルが動的に挿入されます -->
+                    </div>
+                    
+                    <div class="h-5 mt-4">
+                        <p id="request-message" class="text-sm text-green-400 text-center"></p>
+                    </div>
+                </div>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 修正点 ▲▲▲▲▲▲▲▲▲▲ -->
+
+
                 <!-- メンバー一覧表示エリア (変更なし) -->
                 <div id="member-list-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
@@ -92,8 +112,6 @@
                     </div>
                 </div>
 
-                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせ投稿フォームの追加） ▼▼▼▼▼▼▼▼▼▼ -->
-                
                 <!-- お知らせ投稿セクション -->
                 <div id="announcement-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
@@ -157,10 +175,10 @@
                         
                     </div>
                 </div>
-                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+                <!-- ▲▲▲▲▲▲▲▲▲▲ お知らせ投稿フォームの終わり ▲▲▲▲▲▲▲▲▲▲ -->
 
 
-                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（フィードバック受信箱の追加） ▼▼▼▼▼▼▼▼▼▼ -->
+                <!-- フィードバック受信箱の追加 -->
                 <div id="feedback-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8 border-b border-gray-700 pb-4">
                         受信したフィードバック
@@ -174,28 +192,13 @@
                     <!-- フィードバック一覧が挿入されるコンテナ -->
                     <div id="feedback-list-container" class="space-y-8">
                         <!-- ここに JavaScript によって記事が動的に挿入されます -->
-                        
-                        <!-- (表示例)
-                        <article class="border-b border-gray-800 pb-6">
-                            <header class="mb-2 flex justify-between items-center">
-                                <h3 class="text-lg font-serif-jp text-brand-gold-light">
-                                    投稿者: 匿名さん
-                                </h3>
-                                <time class="text-sm text-gray-500">2025年11月29日</time>
-                            </header>
-                            <p class="text-sm text-gray-400 mb-2">Email: member@example.com</p>
-                            <div class="text-gray-300 whitespace-pre-wrap">
-                                フィードバックの本文がここに表示されます。
-                            </div>
-                        </article>
-                        -->
                     </div>
                 </div>
-                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+                <!-- ▲▲▲▲▲▲▲▲▲▲ フィードバック受信箱の終わり ▲▲▲▲▲▲▲▲▲▲ -->
 
 
                 <!-- 新規メンバー追加フォーム (変更なし) -->
-                <div id="admin-content" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;">
+                <div id="create-user-section" class="max-w-lg mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;">
                     
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
                         新規メンバー登録
@@ -265,13 +268,9 @@
         // Firebaseのログイン機能（Auth）を読み込みます
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点（push, serverTimestamp をインポート） ▼▼▼▼▼▼▼▼▼▼
-        // Realtime Database の機能を読み込みます
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点（query, orderByChild をインポート） ▼▼▼▼▼▼▼▼▼▼
-        import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp, query, orderByChild } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-
+        // Realtime Database の機能を読み込みます (push, serverTimestamp, query, orderByChild を追加)
+        import { getDatabase, ref, set, get, onValue, update, remove, push, serverTimestamp, query, orderByChild } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
         // あなたの「本物の」設定情報を貼り付けます
         const firebaseConfig = {
           apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
@@ -293,6 +292,11 @@
         let app, auth, db, currentUserId, currentUserToken;
         
         const pageError = document.getElementById('page-error-message');
+        const joinRequestsSection = document.getElementById('join-requests-section'); // 新規追加
+        const joinRequestsContainer = document.getElementById('join-requests-container'); // 新規追加
+        const requestsLoadingMessage = document.getElementById('requests-loading-message'); // 新規追加
+        const requestMessage = document.getElementById('request-message'); // 新規追加
+
 
         try {
             // Firebaseを初期化します
@@ -321,21 +325,22 @@
                         // 管理者権限あり
                         console.log("管理者権限を確認しました。");
                         // 全ての管理セクションを表示
-                        document.getElementById('admin-content').style.display = 'block';
+                        document.getElementById('create-user-section').style.display = 'block';
                         document.getElementById('member-list-section').style.display = 'block';
-                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                         document.getElementById('announcement-section').style.display = 'block';
-                        document.getElementById('feedback-section').style.display = 'block'; // フィードバックセクションも表示
-                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+                        document.getElementById('feedback-section').style.display = 'block';
+                        joinRequestsSection.style.display = 'block'; // 新規入会セクションを表示
                         
                         // 登録ボタンやログアウトボタンの機能を有効にします
                         setupAdminPage();
                         // メンバー一覧の読み込みを開始します
                         loadAndDisplayMembers();
-                        // ▼▼▼▼▼▼▼▼▼▼ 変更点 ▼▼▼▼▼▼▼▼▼▼
                         // フィードバックの読み込みを開始します
                         loadAndDisplayFeedback();
-                        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
+                        // ▼▼▼▼▼▼▼▼▼▼ 修正点: 新規入会希望者の読み込みを開始 ▼▼▼▼▼▼▼▼▼▼
+                        loadAndDisplayJoinRequests();
+                        // ▲▲▲▲▲▲▲▲▲▲ 修正点 ▲▲▲▲▲▲▲▲▲▲
+
                     } else {
                         // 管理者権限なし
                         console.log("管理者権限がありません。");
@@ -353,10 +358,7 @@
             if(pageError) pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
         }
 
-        
-        /* ▼▼▼▼▼▼▼▼▼▼ 変更点（メンバー一覧を読み込む関数） ▼▼▼▼▼▼▼▼▼▼ */
-        // （このセクションは変更なし）
-        /* ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ */
+        // --- メンバー一覧を読み込む関数 ---
         function loadAndDisplayMembers() {
             const usersRef = ref(db, 'user_roles');
             const listContainer = document.getElementById('member-list-container');
@@ -366,16 +368,22 @@
                 if (snapshot.exists()) {
                     const users = snapshot.val();
                     loadingMessage.style.display = 'none';
+                    // ClubTakeのデザインに合わせたテーブルのHTMLを生成
                     let tableHtml = `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-900"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">メールアドレス</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">権限</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">操作</th></tr></thead><tbody class="bg-black divide-y divide-gray-800">`;
                     
                     Object.entries(users).forEach(([userId, userData]) => {
                         const isCurrentUser = (userId === currentUserId);
-                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td><td class="px-6 py-4 whitespace-nowrap text-sm">${userData.isAdmin ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-900 text-yellow-200">管理者</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium">`;
+                        // メールアドレスが存在しないユーザー（例：匿名ユーザー）は表示しない
+                        if (!userData.email) return; 
+
+                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200"><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${userData.email}</td><td class="px-6 py-4 whitespace-nowrap text-sm">${userData.isAdmin ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-brand-gold-dark text-black">管理者</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-700 text-gray-300">一般</span>'}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium">`;
                         if (isCurrentUser) {
                             tableHtml += `<span class="text-xs text-gray-500">（自分）</span>`;
                         } else if (userData.isAdmin) {
+                            // 降格ボタン
                             tableHtml += `<button type="button" class="role-change-button text-gray-400 hover:text-white transition-colors duration-300" data-user-id="${userId}" data-new-role="false">一般に降格</button>`;
                         } else {
+                             // 昇格ボタン
                              tableHtml += `<button type="button" class="role-change-button text-brand-gold hover:text-brand-gold-light transition-colors duration-300" data-user-id="${userId}" data-new-role="true">管理者に昇格</button>`;
                         }
                         tableHtml += `</td></tr>`;
@@ -386,6 +394,7 @@
                     addEventListenersToButtons();
                 } else {
                     loadingMessage.textContent = 'まだメンバーは登録されていません。';
+                    listContainer.innerHTML = '';
                 }
             }, (error) => {
                 console.error("メンバー一覧の読み込み失敗:", error);
@@ -393,16 +402,58 @@
             });
         }
         
-        // ▼▼▼▼▼▼▼▼▼▼ 変更点（フィードバック読み込み関数を追加） ▼▼▼▼▼▼▼▼▼▼
-        /**
-         * 受信したフィードバックを読み込んで表示する関数
-         */
+        // --- 新規入会希望者を読み込む関数 ---
+        function loadAndDisplayJoinRequests() {
+            const requestsRef = ref(db, 'join_requests'); // Realtime DBのjoin_requestsパスを監視
+            
+            onValue(requestsRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const requests = snapshot.val();
+                    requestsLoadingMessage.style.display = 'none';
+                    
+                    let tableHtml = `<table class="min-w-full divide-y divide-gray-700"><thead class="bg-gray-900"><tr><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">名前 (ユーザーID)</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">メールアドレス</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">申請日時</th><th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">操作</th></tr></thead><tbody class="bg-black divide-y divide-gray-800">`;
+                    
+                    // 新しい順にソートするために配列に変換
+                    const requestArray = Object.entries(requests)
+                        .map(([key, value]) => ({ key, ...value }))
+                        .sort((a, b) => b.createdAt - a.createdAt);
+                        
+                    requestArray.forEach(request => {
+                        const date = new Date(request.createdAt);
+                        const formattedDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+                        tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.name || 'N/A'} <span class="text-gray-500 text-xs">(${request.key.substring(0, 8)}...)</span></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.email || 'N/A'}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <button type="button" class="request-approve-button bg-brand-gold hover:bg-brand-gold-light text-black font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300 mr-2" data-user-id="${request.key}" data-email="${request.email}" data-name="${request.name}">承認</button>
+                                            <button type="button" class="request-reject-button bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300" data-user-id="${request.key}">拒否</button>
+                                        </td>
+                                      </tr>`;
+                    });
+
+                    tableHtml += `</tbody></table>`;
+                    joinRequestsContainer.innerHTML = tableHtml;
+                    addEventListenersToRequestButtons(); // 新しいイベントリスナーを設定
+                } else {
+                    requestsLoadingMessage.textContent = '現在、入会希望者はいません。';
+                    joinRequestsContainer.innerHTML = '';
+                }
+            }, (error) => {
+                console.error("新規入会希望の読み込み失敗:", error);
+                requestsLoadingMessage.textContent = '入会希望の読み込みに失敗しました。';
+            });
+        }
+        
+        // --- フィードバックを読み込む関数 ---
         function loadAndDisplayFeedback() {
             const feedbackRef = ref(db, 'feedback');
             const listContainer = document.getElementById('feedback-list-container');
             const loadingMessage = document.getElementById('feedback-loading-message');
 
             // createdAt（作成日時）で並び替えて、最新のものを取得するクエリ
+            // Realtime DBではorderByChild()を使用
             const feedbackQuery = query(feedbackRef, orderByChild('createdAt'));
 
             // onValue を使って、データベースの変更をリアルタイムで監視します
@@ -417,7 +468,7 @@
                     const feedbackArray = Object.entries(feedbackList)
                         .map(([key, value]) => ({ key, ...value }))
                         .sort((a, b) => b.createdAt - a.createdAt); // 降順（新しい順）
-                    
+                        
                     // XSS対策の関数
                     const escapeHTML = (str) => {
                         if (typeof str !== 'string') return '';
@@ -462,9 +513,7 @@
                 }
             });
         }
-        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-
-
+        
         // --- ページの機能を設定する関数 ---
         function setupAdminPage() {
             
@@ -484,7 +533,7 @@
                 });
             }
 
-            // ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせ投稿ボタンの機能を追加） ▼▼▼▼▼▼▼▼▼▼
+            // --- お知らせ投稿ボタンの機能 ---
             
             // メンバー専用お知らせ 投稿ボタン
             const postMemberButton = document.getElementById('post-member-button');
@@ -566,9 +615,6 @@
                 setTimeout(() => { publicMessage.textContent = ''; }, 3000);
             });
             
-            // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
-            
-
             // 新規メンバー登録ボタンの機能（変更なし）
             const createButton = document.getElementById('create-user-button');
             const messageEl = document.getElementById('message');
@@ -649,6 +695,108 @@
                 });
             }
         }
+        
+        // --- イベントリスナーの追加 ---
+        function addEventListenersToButtons() {
+            // メンバー昇格・降格ボタン
+            document.querySelectorAll('.role-change-button').forEach(button => {
+                // 二重登録防止のため、一旦クローンして元のボタンと置き換える
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+
+                newButton.addEventListener('click', async () => {
+                    const userId = newButton.dataset.userId;
+                    const newRole = newButton.dataset.newRole === 'true';
+                    
+                    const listMessage = document.getElementById('list-message');
+                    listMessage.textContent = '権限変更中...';
+                    listMessage.className = 'text-sm text-yellow-400 text-center';
+
+                    try {
+                        const roleRef = ref(db, `user_roles/${userId}`);
+                        await update(roleRef, { isAdmin: newRole });
+                        listMessage.textContent = `権限を ${newRole ? '管理者' : '一般'} に変更しました。`;
+                        listMessage.className = 'text-sm text-green-400 text-center';
+                    } catch (error) {
+                        console.error("権限変更失敗:", error);
+                        listMessage.textContent = '権限変更に失敗しました。';
+                        listMessage.className = 'text-sm text-red-400 text-center';
+                    }
+                    setTimeout(() => { listMessage.textContent = ''; }, 3000);
+                });
+            });
+        }
+        
+        // --- 新規入会申請ボタンのイベントリスナー（新規追加） ---
+        function addEventListenersToRequestButtons() {
+            const container = document.getElementById('join-requests-container');
+            const requestMessage = document.getElementById('request-message');
+
+            // 承認ボタン
+            container.querySelectorAll('.request-approve-button').forEach(button => {
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                
+                newButton.addEventListener('click', async () => {
+                    const userId = newButton.dataset.userId;
+                    const email = newButton.dataset.email;
+                    const name = newButton.dataset.name;
+
+                    requestMessage.textContent = '承認処理中...';
+                    requestMessage.className = 'text-sm text-yellow-400 text-center';
+
+                    try {
+                        // 1. users_roles に一般メンバーとして追加
+                        const userRoleRef = ref(db, `user_roles/${userId}`);
+                        await set(userRoleRef, {
+                            email: email,
+                            isAdmin: false, // 新規メンバーは一般（isAdmin: false）として登録
+                            name: name || 'N/A' // 名前もあれば追加
+                        });
+                        
+                        // 2. join_requests から申請データを削除
+                        const joinRequestRef = ref(db, `join_requests/${userId}`);
+                        await remove(joinRequestRef);
+                        
+                        requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を承認し、メンバー登録しました。`;
+                        requestMessage.className = 'text-sm text-green-400 text-center';
+                    } catch (error) {
+                        console.error("承認失敗:", error);
+                        requestMessage.textContent = '承認処理に失敗しました。';
+                        requestMessage.className = 'text-sm text-red-400 text-center';
+                    }
+                    setTimeout(() => { requestMessage.textContent = ''; }, 3000);
+                });
+            });
+            
+            // 拒否ボタン
+            container.querySelectorAll('.request-reject-button').forEach(button => {
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                
+                newButton.addEventListener('click', async () => {
+                    const userId = newButton.dataset.userId;
+
+                    requestMessage.textContent = '拒否処理中...';
+                    requestMessage.className = 'text-sm text-yellow-400 text-center';
+
+                    try {
+                        // join_requests から申請データを削除
+                        const joinRequestRef = ref(db, `join_requests/${userId}`);
+                        await remove(joinRequestRef);
+                        
+                        requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を拒否しました。`;
+                        requestMessage.className = 'text-sm text-green-400 text-center';
+                    } catch (error) {
+                        console.error("拒否失敗:", error);
+                        requestMessage.textContent = '拒否処理に失敗しました。';
+                        requestMessage.className = 'text-sm text-red-400 text-center';
+                    }
+                    setTimeout(() => { requestMessage.textContent = ''; }, 3000);
+                });
+            });
+        }
+
 
     </script>
 

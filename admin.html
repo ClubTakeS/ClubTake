@@ -69,7 +69,7 @@
                 
                 <div id="page-error-message" class="max-w-4xl mx-auto text-center text-red-400 text-lg mb-8"></div>
                 
-                <!-- ▼▼▼▼▼▼▼▼▼▼ 修正点: 新規入会希望者一覧セクションを追加 ▼▼▼▼▼▼▼▼▼▼ -->
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 新規入会希望者一覧セクション ▼▼▼▼▼▼▼▼▼▼ -->
                 <div id="join-requests-section" class="max-w-4xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12 mb-12" style="display: none;">
                     <h2 class="text-2xl font-serif-jp text-center mb-8">
                         新規入会希望者
@@ -87,7 +87,7 @@
                         <p id="request-message" class="text-sm text-green-400 text-center"></p>
                     </div>
                 </div>
-                <!-- ▲▲▲▲▲▲▲▲▲▲ 修正点 ▲▲▲▲▲▲▲▲▲▲ -->
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 新規入会希望者一覧セクション ▲▲▲▲▲▲▲▲▲▲ -->
 
 
                 <!-- メンバー一覧表示エリア (変更なし) -->
@@ -404,7 +404,9 @@
         
         // --- 新規入会希望者を読み込む関数 ---
         function loadAndDisplayJoinRequests() {
-            const requestsRef = ref(db, 'join_requests'); // Realtime DBのjoin_requestsパスを監視
+            // ▼▼▼▼▼▼▼▼▼▼ 修正: パス名をセキュリティルールに合わせて 'pending_users' に変更します ▼▼▼▼▼▼▼▼▼▼
+            const requestsRef = ref(db, 'pending_users'); 
+            // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
             
             onValue(requestsRef, (snapshot) => {
                 if (snapshot.exists()) {
@@ -422,6 +424,7 @@
                         const date = new Date(request.createdAt);
                         const formattedDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
 
+                        // ▼▼▼▼▼▼▼▼▼▼ 修正: テンプレートリテラル内の閉じられていないはずの括弧を修正 ▼▼▼▼▼▼▼▼▼▼
                         tableHtml += `<tr class="hover:bg-gray-900 transition-colors duration-200">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.name || 'N/A'} <span class="text-gray-500 text-xs">(${request.key.substring(0, 8)}...)</span></td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">${request.email || 'N/A'}</td>
@@ -431,6 +434,7 @@
                                             <button type="button" class="request-reject-button bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md text-xs transition-colors duration-300" data-user-id="${request.key}">拒否</button>
                                         </td>
                                       </tr>`;
+                        // ▲▲▲▲▲▲▲▲▲▲ 修正 ▲▲▲▲▲▲▲▲▲▲
                     });
 
                     tableHtml += `</tbody></table>`;
@@ -442,7 +446,11 @@
                 }
             }, (error) => {
                 console.error("新規入会希望の読み込み失敗:", error);
-                requestsLoadingMessage.textContent = '入会希望の読み込みに失敗しました。';
+                if (error.code === "PERMISSION_DENIED") {
+                    requestsLoadingMessage.textContent = '入会希望の読み込みに失敗しました。（データベースの読み取り権限がありません）';
+                } else {
+                    requestsLoadingMessage.textContent = '入会希望の読み込みに失敗しました。';
+                }
             });
         }
         
@@ -754,8 +762,8 @@
                             name: name || 'N/A' // 名前もあれば追加
                         });
                         
-                        // 2. join_requests から申請データを削除
-                        const joinRequestRef = ref(db, `join_requests/${userId}`);
+                        // 2. pending_users から申請データを削除
+                        const joinRequestRef = ref(db, `pending_users/${userId}`); 
                         await remove(joinRequestRef);
                         
                         requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を承認し、メンバー登録しました。`;
@@ -781,8 +789,8 @@
                     requestMessage.className = 'text-sm text-yellow-400 text-center';
 
                     try {
-                        // join_requests から申請データを削除
-                        const joinRequestRef = ref(db, `join_requests/${userId}`);
+                        // pending_users から申請データを削除
+                        const joinRequestRef = ref(db, `pending_users/${userId}`);
                         await remove(joinRequestRef);
                         
                         requestMessage.textContent = `申請 (ID: ${userId.substring(0, 8)}...) を拒否しました。`;

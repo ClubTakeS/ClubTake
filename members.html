@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClubTake - メンバーズラウンジ</title>
+    <title>ClubTake - メンバー専用ページ</title>
     <!-- Tailwind CSS を読み込みます -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
@@ -42,61 +42,270 @@
             <!-- ロゴ -->
             <div class="text-2xl font-serif-jp font-bold">
                 <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                    ClubTake
+                    ClubTake [Members]
                 </span>
             </div>
             <!-- ナビゲーション（PC用） -->
             <div class="flex space-x-4 md:space-x-8 text-sm tracking-wide">
-                <!-- Members (このページ) がアクティブであることを示す -->
                 <a href="index.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Home</a>
-                <a href="login.html" class="text-white hover:text-brand-gold transition-colors duration-300">Members</a>
-                <a href="#" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（ログアウトボタン） ▼▼▼▼▼▼▼▼▼▼ -->
+                <a href="#" id="logout-button" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">ログアウト</a>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
             </div>
         </nav>
     </header>
 
     <!-- メインコンテンツ -->
     <main>
-        <!-- メンバー専用セクション -->
-        <section class="relative flex items-center justify-center py-20 md:py-48" style="min-height: calc(100vh - 158px);">
+        <section class="py-20 md:py-24" style="min-height: calc(100vh - 158px);">
             
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-5xl font-serif-jp font-bold hero-text-1" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
-                    ようこそ、メンバーズラウンジへ。
+            <div class="container mx-auto px-6">
+
+                <!-- ページタイトル -->
+                <h1 class="text-3xl md:text-4xl font-serif-jp mb-12 text-center">
+                    <span id="welcome-message" class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
+                        <!-- ここに「〇〇様、ようこそ」と表示されます -->
+                        読み込み中...
+                    </span>
                 </h1>
-                <p class="text-xl md:text-2xl font-serif-jp hero-text-2 mt-4" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
-                    ごゆっくりおくつろぎください。
-                </p>
+                
+                <!-- エラーメッセージ（ログインしていない時など） -->
+                <div id="page-error-message" class="max-w-4xl mx-auto text-center text-red-400 text-lg mb-8"></div>
+                
+
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（お知らせセクションの追加） ▼▼▼▼▼▼▼▼▼▼ -->
+
+                <!-- メンバー専用お知らせエリア -->
+                <div id="announcements-section" class="max-w-3xl mx-auto bg-black border border-gray-800 rounded-lg shadow-xl overflow-hidden p-8 md:p-12" style="display: none;"> <!-- 初期状態は非表示 -->
+                    <h2 class="text-2xl font-serif-jp text-center mb-8 border-b border-gray-700 pb-4">
+                        メンバー専用お知らせ
+                    </h2>
+                    
+                    <!-- お知らせ一覧の読み込み中メッセージ -->
+                    <div id="loading-message" class="text-center text-gray-400">
+                        お知らせを読み込んでいます...
+                    </div>
+                    
+                    <!-- お知らせ一覧が挿入されるコンテナ -->
+                    <div id="announcements-list" class="space-y-8">
+                        <!-- ここに JavaScript によって記事が動的に挿入されます -->
+                        
+                        <!-- (表示例)
+                        <article class="border-b border-gray-800 pb-6">
+                            <header class="mb-2">
+                                <h3 class="text-xl font-serif-jp text-brand-gold-light">お知らせのタイトル</h3>
+                                <time class="text-sm text-gray-500">2025年11月29日</time>
+                            </header>
+                            <div class="text-gray-300 whitespace-pre-wrap">
+                                お知らせの本文がここに表示されます。
+                                改行もそのまま反映されます。
+                            </div>
+                        </article>
+                        -->
+                        
+                    </div>
+                </div>
+
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+
             </div>
         </section>
     </main>
 
-    <!-- 共通フッター -->
+    <!-- 共通フッター（変更なし） -->
     <footer class="py-16 bg-black border-t border-gray-800">
         <div class="container mx-auto px-6 text-center text-gray-400">
-            <!-- ロゴ -->
-            <div class="text-2xl font-serif-jp font-bold mb-4">
-                <span class="bg-gradient-to-b from-brand-gold-light via-brand-gold to-brand-gold-dark bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(192,161,107,0.4)]">
-                    ClubTake
-                </span>
-            </div>
-            <!-- 住所など -->
-            <p class="text-sm">〒XXX-XXXX 東京都千代田区丸の内X-X-X</p>
-            <p class="text-sm">TEL: 03-XXXX-XXXX</p>
-            <!-- フッターナビ -->
-            <div class="flex justify-center space-x-6 my-6 text-sm">
-                <a href="#" class="hover:text-brand-gold transition-colors duration-300">サイトマップ</a>
-                <a href="#" class="hover:text-brand-gold transition-colors duration-300">プライバシーポリシー</a>
-            </div>
-            <!-- コピーライト -->
             <p class="text-xs text-gray-500 mt-8">
-                &copy; 2025 ClubTake. All Rights Reserved.
+                &copy; 2025 ClubTake. All Rights Reserved. [Members Only]
             </p>
         </div>
     </footer>
 
-    <!-- アニメーションのコードを外部ファイル(js/main.js)から読み込みます -->
-    <script src="js/main.js" defer></script>
+    <!-- Firebaseの機能を読み込む -->
+    <script type="module">
+        // Firebaseの基本的な機能（App）を読み込みます
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Firebaseのログイン機能（Auth）を読み込みます
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // ▼▼▼▼▼▼▼▼▼▼ 変更点（Realtime DBのインポート） ▼▼▼▼▼▼▼▼▼▼
+        // Realtime Database の機能を読み込みます (onValue, ref, query, orderByChild, limitToLast)
+        import { getDatabase, ref, query, orderByChild, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
+        // あなたの「本物の」設定情報を貼り付けます
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgpAbNmhRGgxiJusSqo1mG1wJbX4TS0uI",
+          authDomain: "clubtake-257af.firebaseapp.com",
+          projectId: "clubtake-257af",
+          storageBucket: "clubtake-257af.firebasestorage.app",
+          messagingSenderId: "871043706318",
+          appId: "1:871043706318:web:19e8cfb02823003e518f9f",
+          measurementId: "G-NVXMV89KHP"
+        };
+        
+        // Realtime Database の URL を config に追加します
+        firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
+
+        // グローバル変数として宣言
+        let app, auth, db;
+        
+        const pageError = document.getElementById('page-error-message');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const announcementsSection = document.getElementById('announcements-section');
+
+        try {
+            // Firebaseを初期化します
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            // Realtime Database を初期化します
+            db = getDatabase(app);
+            
+            // ログイン状態をブラウザに保存するように設定
+            await setPersistence(auth, browserLocalPersistence);
+
+            // ログイン状態を監視します
+            onAuthStateChanged(auth, async (user) => {
+                
+                if (user && !user.isAnonymous) {
+                    // ログイン成功
+                    console.log("メンバー専用ページ：ユーザーを認識しました:", user.email);
+                    
+                    // 「〇〇様、ようこそ」と表示
+                    const userEmailName = user.email.split('@')[0]; // メールアドレスの@より前
+                    welcomeMessage.textContent = `${userEmailName}様、ようこそ`;
+                    
+                    // お知らせセクションを表示
+                    announcementsSection.style.display = 'block';
+
+                    // ログアウトボタンを有効化
+                    setupLogoutButton();
+                    
+                    // メンバー専用お知らせの読み込みを開始
+                    loadMemberAnnouncements();
+
+                } else {
+                    // ログインしていない（または匿名ユーザー）
+                    console.log("メンバー専用ページ：ログインしていません。");
+                    welcomeMessage.textContent = 'アクセスできません';
+                    pageError.textContent = "ログインしていません。3秒後にログインページに戻ります。";
+                    
+                    // 3秒後にログインページにリダイレクト
+                    setTimeout(() => {
+                        const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                        window.location.href = window.location.origin + repoPath + '/login.html';
+                    }, 3000);
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            welcomeMessage.textContent = 'エラー';
+            pageError.textContent = "システムの初期化に失敗しました。ページを再読み込みしてください。";
+        }
+
+        /**
+         * ログアウトボタンの機能を設定する関数
+         */
+        function setupLogoutButton() {
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    try {
+                        await signOut(auth);
+                        console.log("ログアウトしました。");
+                        const repoPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                        window.location.href = window.location.origin + repoPath + '/index.html'; // トップページに戻る
+                    } catch (error) {
+                        console.error("ログアウト失敗:", error);
+                    }
+                });
+            }
+        }
+
+        /**
+         * メンバー専用お知らせを読み込んで表示する関数
+         */
+        function loadMemberAnnouncements() {
+            const announcementsRef = ref(db, 'member_announcements');
+            const listContainer = document.getElementById('announcements-list');
+            const loadingMessage = document.getElementById('loading-message');
+
+            // createdAt（作成日時）で並び替えて、最新のものを取得するクエリ
+            // ★注意★ Realtime Databaseは「昇順」しかサポートしていないため、
+            // JavaScript側で「降順（新しい順）」に並び替える必要があります。
+            const announcementsQuery = query(announcementsRef, orderByChild('createdAt'));
+
+            // onValue を使って、データベースの変更をリアルタイムで監視します
+            onValue(announcementsQuery, (snapshot) => {
+                if (snapshot.exists()) {
+                    const announcements = snapshot.val();
+                    
+                    // 読み込みメッセージを非表示に
+                    loadingMessage.style.display = 'none';
+                    // 既存のリストをクリア
+                    listContainer.innerHTML = '';
+                    
+                    // データベースから取得したデータを配列に変換し、「新しい順」に並び替える
+                    const announcementsArray = Object.entries(announcements)
+                        .map(([key, value]) => ({ key, ...value })) // オブジェクトを配列に
+                        .sort((a, b) => b.createdAt - a.createdAt); // createdAt の降順（新しい順）でソート
+                    
+                    
+                    // 並び替えた配列を使って、お知らせのHTMLを組み立てる
+                    announcementsArray.forEach(post => {
+                        
+                        // タイムスタンプ（数字）を「YYYY年MM月DD日」の形式に変換
+                        const date = new Date(post.createdAt);
+                        const formattedDate = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                        
+                        // XSS（クロスサイトスクリプティング）対策：
+                        // ユーザーが入力した可能性のあるテキストを安全に表示するための関数
+                        const escapeHTML = (str) => str.replace(/[&<>"']/g, (match) => {
+                            return {
+                              '&': '&amp;',
+                              '<': '&lt;',
+                              '>': '&gt;',
+                              '"': '&quot;',
+                              "'": '&#39;'
+                            }[match];
+                        });
+
+                        const article = document.createElement('article');
+                        article.className = 'border-b border-gray-800 pb-6 fade-in'; // fade-inクラスを追加
+                        
+                        article.innerHTML = `
+                            <header class="mb-2">
+                                <h3 class="text-xl font-serif-jp text-brand-gold-light">${escapeHTML(post.title)}</h3>
+                                <time class="text-sm text-gray-500">${formattedDate}</time>
+                            </header>
+                            <div class="text-gray-300 whitespace-pre-wrap">${escapeHTML(post.content)}</div>
+                        `;
+                        
+                        listContainer.appendChild(article);
+                    });
+                    
+                    // アニメーションをトリガー
+                    // (style.css に .fade-in { animation: ... } がある前提)
+                    setTimeout(() => {
+                        document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+                    }, 10);
+
+
+                } else {
+                    // お知らせが一件もない場合
+                    loadingMessage.textContent = '現在、メンバー専用のお知らせはありません。';
+                }
+            }, (error) => {
+                console.error("お知らせの読み込み失敗:", error);
+                loadingMessage.textContent = 'お知らせの読み込みに失敗しました。';
+                if (error.code === "PERMISSION_DENIED") {
+                    loadingMessage.textContent = 'お知らせの読み取り権限がありません。';
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>

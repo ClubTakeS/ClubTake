@@ -1,1 +1,45 @@
+/* 読み込んだフォントをTailwindで使えるように設定します */
+/* (Tailwind Configでも設定していますが、念のためCSS側でも定義しておくと確実です) */
+.font-sans {
+    font-family: 'Inter', sans-serif;
+}
+.font-serif-jp {
+    font-family: 'Noto Serif JP', serif;
+}
 
+/* ▼▼▼▼▼▼▼▼▼▼ 変更点（アニメーション用のCSS） ▼▼▼▼▼▼▼▼▼▼ */
+
+/* 初期状態: 透明で少し下に下がっている */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* 画面に入ったときの状態: 不透明で元の位置に戻る */
+.fade-in.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ファーストビューのテキスト用（遅延） */
+.hero-text-1 {
+    opacity: 0;
+    animation: heroFadeIn 1.5s ease-out 0.5s forwards; /* 0.5秒遅れて開始 */
+}
+.hero-text-2 {
+    opacity: 0;
+    animation: heroFadeIn 1.5s ease-out 1.0s forwards; /* 1.0秒遅れて開始 */
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ */

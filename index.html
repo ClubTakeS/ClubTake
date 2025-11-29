@@ -12,8 +12,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- CSSファイルを読み込みます -->
-    <link rel="stylesheet" href="css/style.css">
-
+    <!-- この環境では外部CSSは読み込まれないため、Tailwindのカスタム設定をHTML内に維持します -->
+    
+    <style>
+        /* ClubTakeの基本スタイル (黒とゴールド) */
+        body { background-color: black; color: #E5E7EB; font-family: 'Inter', sans-serif; }
+        .modal { display: none; }
+        .modal.show { 
+            display: block; 
+            /* モーダルが開いたときに画面上部からフェードインさせる */
+            animation: fadeIn 0.3s ease-out;
+        }
+        .hero-section {
+            /* ヒーロー画像はそのまま維持 */
+            background-image: url('images/富士山.jpg'); 
+            background-size: cover;
+            background-position: center;
+            /* 画面の高さいっぱいに表示するために h-screen を維持し、min-h を削除 */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
     <script>
         // Tailwind CSSのカスタム設定
         tailwind.config = {
@@ -48,6 +69,9 @@
                 <a href="index.html" class="text-white hover:text-brand-gold transition-colors duration-300">Home</a>
                 <a href="login.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Members</a>
                 <a href="feedback.html" class="text-gray-300 hover:text-brand-gold transition-colors duration-300">Feedback</a>
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 追加: 管理者リンク ▼▼▼▼▼▼▼▼▼▼ -->
+                <a href="admin.html" id="admin-link" class="hidden text-green-400 hover:text-green-200 transition-colors duration-300">Admin</a>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲ -->
             </div>
         </nav>
     </header>
@@ -58,17 +82,17 @@
         <!-- 1. トップページ: セクション1 (ファーストビュー) -->
         <section class="h-screen min-h-[700px] relative flex items-center justify-center text-center text-white overflow-hidden">
             
-            <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（背景画像を富士山に変更） ▼▼▼▼▼▼▼▼▼▼ -->
+            <!-- ▼▼▼▼▼▼▼▼▼▼ 背景画像を維持 ▼▼▼▼▼▼▼▼▼▼ -->
             <!-- 背景画像（style="..." のURLを、あなたがアップロードした「富士山.jpg」のパスに変更しました） -->
             <div class="absolute inset-0 bg-cover bg-center z-0" 
                  style="background-image: url('images/富士山.jpg');">
             </div>
-            <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
+            <!-- ▲▲▲▲▲▲▲▲▲▲ 背景画像を維持 ▲▲▲▲▲▲▲▲▲▲ -->
             
             <!-- 背景のオーバーレイ（黒い透かし） -->
             <div class="absolute inset-0 bg-black opacity-60 z-10"></div>
             
-            <!-- 中央配置テキスト -->
+            <!-- 中央配置テキストとボタン -->
             <div class="relative z-20 p-8 space-y-4">
                 <h1 class="text-4xl md:text-6xl font-serif-jp font-bold hero-text-1" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
                     ようこそ、ClubTakeへ。
@@ -76,8 +100,38 @@
                 <p class="text-xl md:text-3xl font-serif-jp hero-text-2" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.7);">
                     理知が交差し、中立性が守られる場所。
                 </p>
+                <!-- ▼▼▼▼▼▼▼▼▼▼ 追加: コミュニティ参加ボタン ▼▼▼▼▼▼▼▼▼▼ -->
+                <button id="main-join-button" class="mt-8 bg-brand-gold hover:bg-brand-gold-light text-black font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+                    コミュニティに参加する
+                </button>
+                <!-- ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲ -->
             </div>
         </section>
+
+        <!-- ▼▼▼▼▼▼▼▼▼▼ 追加: 参加申請モーダル ▼▼▼▼▼▼▼▼▼▼ -->
+        <div id="joinModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-1/4 mx-auto p-8 border border-gray-700 w-full max-w-md shadow-2xl rounded-lg bg-black transform -translate-y-1/2 md:translate-y-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-serif-jp text-brand-gold">コミュニティに参加申請</h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-white text-3xl">&times;</button>
+                </div>
+                <form id="joinForm" class="space-y-4">
+                    <div>
+                        <label for="joinName" class="block text-sm font-medium text-gray-300">お名前 (ニックネーム可)</label>
+                        <input type="text" id="joinName" class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white" required>
+                    </div>
+                    <div>
+                        <label for="joinEmail" class="block text-sm font-medium text-gray-300">メールアドレス</label>
+                        <input type="email" id="joinEmail" class="mt-1 w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white" required>
+                    </div>
+                    <p id="joinMessage" class="text-sm text-red-400 pt-2"></p>
+                    <button type="submit" id="submitJoinRequest" class="w-full justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-brand-gold hover:bg-brand-gold-light transition-all duration-300">
+                        申請を送信する
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- ▲▲▲▲▲▲▲▲▲▲ 追加 ▲▲▲▲▲▲▲▲▲▲ -->
 
         <!-- 1. トップページ: セクション2 (ご挨拶) -->
         <section class="py-20 md:py-32 bg-black fade-in">
@@ -89,9 +143,9 @@
                         </span>
                     </h2>
                     <p class="text-base leading-relaxed text-gray-300">
-                        CLUB Takeは、高度な専門知識を持つ人々が、社会的な立場を超えて集う場所です。
-                        当クラブへの入会は過去の実績ではなく、「クラブのルールを尊重し、真のプロフェッショナルとして行動する」という決意によってのみ決まります。
-                        ここでは、あらゆる敵対行為が禁じられ、絶対的な中立性が保障されます。外部の混乱から隔離されたこの空間で、信頼できる情報交換と協力のひとときをお過ごしください。
+                        CLUB Takeは、高度な専門知識を持つ人々が、社会的な立場を超えて集う場所です。<br>
+                        当クラブへの入会は過去の実績ではなく、「クラブのルールを尊重し、真のプロフェッショナルとして行動する」という決意によってのみ決まります。<br>
+                        ここでは、あらゆる敵対行為が禁じられ、絶対的な中立性が保障されます。外部の混乱から隔離されたこの空間で、信頼できる情報交換と協力のひとときをお過ごしください。<br>
                     </p>
                 </div>
             </div>
@@ -115,7 +169,7 @@
                                 </span>
                             </h3>
                             <p class="text-sm text-gray-300 leading-relaxed">
-                                外部の混乱から隔離された、絶対的な中立空間。ここでは、ただ知的な交流だけが許されます。
+                                外部の混乱から隔離された、絶対的な中立空間。ここでは、ただ知的な交流だけが許されます。<br>
                             </p>
                         </div>
                     </div>
@@ -128,7 +182,7 @@
                                 </span>
                             </h3>
                             <p class="text-sm text-gray-300 leading-relaxed">
-                                利害が対立する組織のメンバーであっても、ここでは互いへの敬意と中立を維持することが求められます。
+                                利害が対立する組織のメンバーであっても、ここでは互いへの敬意と中立を維持することが求められます。<br>
                             </p>
                         </div>
                     </div>
@@ -141,7 +195,7 @@
                                 </span>
                             </h3>
                             <p class="text-sm text-gray-300 leading-relaxed">
-                                2025年7月9日。私たちは社会的な因縁を脇に置き、クラブの「叡信」の原則にのみ従うことを誓いました。
+                                2025年7月9日。私たちは社会的な因縁を脇に置き、クラブの「叡信」の原則にのみ従うことを誓いました。<br>
                             </p>
                         </div>
                     </div>
@@ -204,7 +258,9 @@
         // Firebaseの基本的な機能（App）を読み込みます
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // Realtime Database の機能を読み込みます
-        import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, query, orderByChild, limitToLast, onValue, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // 認証機能を追加
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // あなたの「本物の」設定情報を貼り付けます
         const firebaseConfig = {
@@ -220,26 +276,199 @@
         // Realtime Database の URL を config に追加します
         firebaseConfig.databaseURL = "https://clubtake-257af-default-rtdb.firebaseio.com/";
 
-        let app, db;
+        let app, db, auth, userId; // Auth を追加
+        let isMember = false;
+        let isAdmin = false;
+
         const listContainer = document.getElementById('news-list-container');
         const loadingMessage = document.getElementById('news-loading-message');
+        
+        // ▼▼▼▼▼▼▼▼▼▼ UI要素の取得（新規追加） ▼▼▼▼▼▼▼▼▼▼
+        const joinButton = document.getElementById('main-join-button');
+        const joinModal = document.getElementById('joinModal');
+        const closeModal = document.getElementById('closeModal');
+        const joinForm = document.getElementById('joinForm');
+        const joinMessage = document.getElementById('joinMessage');
+        const adminLink = document.getElementById('admin-link');
+        // ▲▲▲▲▲▲▲▲▲▲ UI要素の取得（新規追加） ▲▲▲▲▲▲▲▲▲▲
 
         try {
             // Firebaseを初期化します
             app = initializeApp(firebaseConfig);
             // Realtime Database を初期化します
             db = getDatabase(app);
+            // Auth を初期化します
+            auth = getAuth(app);
             
             // お知らせの読み込みを開始します
             loadPublicNews();
+            
+            // 認証とUIリスナーのセットアップを開始
+            setupAuthAndListeners();
 
         } catch (error) {
             console.error("Firebase initialization error:", error);
             if(loadingMessage) loadingMessage.textContent = "システムの初期化に失敗しました。";
         }
 
+        // ▼▼▼▼▼▼▼▼▼▼ 認証とリスナーの設定関数（新規追加） ▼▼▼▼▼▼▼▼▼▼
+        async function setupAuthAndListeners() {
+            setupAuthListener();
+            setupUIListeners();
+        }
+
+        async function checkAndSignIn() {
+            try {
+                // 匿名サインインを試みる
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("サインインエラー:", error);
+            }
+        }
+
+        function setupAuthListener() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    // 匿名ユーザーの場合は DB アクセスをスキップ
+                    if (user.isAnonymous) {
+                         joinButton.textContent = "コミュニティに参加する";
+                         joinButton.disabled = false;
+                         joinButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        // 認証済みユーザーの場合のみ、役割と申請状況をチェック
+                        await checkUserRole(userId);
+                    }
+                } else {
+                    // ログアウト状態の場合、匿名でサインインを試みる
+                    checkAndSignIn();
+                }
+            });
+        }
+        
+        async function checkUserRole(uid) {
+            try {
+                const roleRef = ref(db, `user_roles/${uid}`);
+                const snapshot = await get(roleRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    isMember = true; // DBに存在する=メンバーと見なす
+                    isAdmin = userData.isAdmin === true;
+                    
+                    if (isAdmin) {
+                        adminLink.classList.remove('hidden');
+                    }
+                    // メンバーであれば、ボタンを「ログイン済み」状態に変更 
+                    joinButton.textContent = "メンバーとしてログイン済み";
+                    joinButton.disabled = true;
+                    joinButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    
+                } else {
+                    isMember = false;
+                    checkPendingRequest(uid);
+                }
+            } catch (error) {
+                console.error("ユーザー役割チェックエラー:", error);
+            }
+        }
+
+        async function checkPendingRequest(uid) {
+            // 認証済みユーザー（匿名ではない）の申請状況をチェック
+            try {
+                // パス名は admin.html と同じ 'pending_users' に統一
+                const pendingRef = ref(db, `pending_users/${uid}`);
+                const snapshot = await get(pendingRef);
+
+                if (snapshot.exists()) {
+                    // 申請済み
+                    joinButton.textContent = "参加申請済み (承認待ち)";
+                    joinButton.disabled = true;
+                    joinButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    // 未申請
+                    joinButton.textContent = "コミュニティに参加する";
+                    joinButton.disabled = false;
+                    joinButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            } catch (error) {
+                // 認証済みユーザーでエラーが出る場合、DBルールが原因なので、その旨を表示
+                console.error("申請状況チェックエラー:", error);
+                
+                if (error.code && error.code.includes('PERMISSION_DENIED')) {
+                    joinButton.textContent = "申請状況の確認に失敗（DBルールエラー）";
+                    joinButton.disabled = true;
+                    joinButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    joinButton.textContent = "エラーが発生しました";
+                    joinButton.disabled = true;
+                }
+            }
+        }
+        
+        function setupUIListeners() {
+            // モーダルを閉じる
+            closeModal.addEventListener('click', () => {
+                joinModal.classList.remove('show');
+                joinMessage.textContent = '';
+            });
+
+            // joinButton のリスナーを setupAuthListener の外に移動し、常に有効にする
+            // ただし、ボタンが disabled でない場合のみモーダルを開く
+            joinButton.addEventListener('click', () => {
+                if (!joinButton.disabled) {
+                    joinModal.classList.add('show');
+                    joinMessage.textContent = '';
+                }
+            });
+
+            // 参加申請フォーム
+            joinForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // 匿名ユーザーでも申請は可能
+                if (!userId) {
+                    joinMessage.textContent = '認証に失敗しました。ページを再読み込みしてください。';
+                    return;
+                }
+                
+                const name = document.getElementById('joinName').value;
+                const email = document.getElementById('joinEmail').value;
+                const submitButton = document.getElementById('submitJoinRequest');
+                submitButton.disabled = true;
+                submitButton.textContent = '申請中...';
+
+                try {
+                    // Realtime Database に申請データを書き込む (pending_users)
+                    const requestRef = ref(db, `pending_users/${userId}`); 
+                    await set(requestRef, {
+                        email: email,
+                        name: name,
+                        createdAt: serverTimestamp(),
+                        status: 'pending' // pending_usersのvalidateルールに合わせる
+                    });
+
+                    joinModal.classList.remove('show');
+                    joinForm.reset();
+                    
+                    // 申請ボタンの状態を更新 (DBチェックに頼らず、成功したらすぐにUIを更新する)
+                    joinButton.textContent = "参加申請済み (承認待ち)";
+                    joinButton.disabled = true;
+                    joinButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                } catch (error) {
+                    console.error("参加申請エラー:", error);
+                    joinMessage.textContent = `申請に失敗しました: ${error.message}`;
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = '申請を送信する';
+                }
+            });
+        }
+        // ▲▲▲▲▲▲▲▲▲▲ 認証とリスナーの設定関数（新規追加） ▲▲▲▲▲▲▲▲▲▲
+        
+
         /**
-         * 一般公開用お知らせを読み込んで表示する関数
+         * 一般公開用お知らせを読み込んで表示する関数 (既存のロジックを維持)
          */
         function loadPublicNews() {
             const newsRef = ref(db, 'public_news');

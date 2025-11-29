@@ -34,7 +34,6 @@
             }
         }
     </script>
-    <!-- ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲ -->
     
     <!-- Google Fonts（明朝体とサンセリフ体）を読み込みます -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,7 +103,7 @@
 
         <section class="py-20 md:py-24">
             
-            <div class="container mx-auto px-6">
+            <div class="container mx.auto px-6">
 
                 <!-- ▼▼▼▼▼▼▼▼▼▼ 変更点（プロフィールカードと会員一覧のコンテナ） ▼▼▼▼▼▼▼▼▼▼ -->
                 <div id="member-dashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-12 fade-in" style="display: none;">
@@ -241,8 +240,8 @@
         import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
         // ▼▼▼▼▼▼▼▼▼▼ 変更点（Realtime DBのインポート） ▼▼▼▼▼▼▼▼▼▼
-        // get, update, query, orderByChild を追加
-        import { getDatabase, ref, query, orderByChild, onValue, get, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // set を追加
+        import { getDatabase, ref, query, orderByChild, onValue, get, update, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
         // あなたの「本物の」設定情報を貼り付けます
@@ -297,7 +296,7 @@
 
                         if (snapshot.exists()) {
                             // --- 承認済みメンバー ---
-                            const userData = snapshot.val();
+                            let userData = snapshot.val(); // ★ let に変更
                             
                             // 1. ウェルカムメッセージを表示
                             const displayName = userData.nickname || userData.email;
@@ -308,6 +307,7 @@
                             
                             // 3. プロフィールカードを読み込み
                             loadProfileCard(user, userData);
+                            // setupProfileEditing に userData を渡す
                             setupProfileEditing(user, userData);
                             
                             // 4. メンバー専用お知らせを読み込み
@@ -367,6 +367,8 @@
 
         /**
          * プロフィール編集のイベントリスナーを設定する
+         * @param {object} user - Firebase Auth の user オブジェクト
+         * @param {object} userData - Realtime DB の user_roles データ
          */
         function setupProfileEditing(user, userData) {
             const viewMode = document.getElementById('profile-view');
@@ -401,23 +403,36 @@
                 messageEl.textContent = '保存中...';
                 messageEl.className = 'text-sm text-yellow-400 text-center';
                 
-                const updates = {
-                    nickname: nicknameInput.value,
-                    name: nameInput.value,
-                    birthday: birthdayInput.value
+                // ▼▼▼▼▼▼▼▼▼▼ 変更点（必須項目を追加） ▼▼▼▼▼▼▼▼▼▼
+                // update() ではなく set() を使うため、
+                // 変更しない項目 (email, isAdmin, createdAt) も含めた
+                // オブジェクト全体を送信します。
+                const newData = {
+                    // 必須項目 (既存の値をそのまま送信)
+                    email: userData.email,
+                    isAdmin: userData.isAdmin,
+                    createdAt: userData.createdAt || null, // (古いデータに無い場合も考慮)
+                    
+                    // 編集された項目
+                    nickname: nicknameInput.value || '', // 空文字を保存
+                    name: nameInput.value || '',
+                    birthday: birthdayInput.value || ''
                 };
+                // ▲▲▲▲▲▲▲▲▲▲ 変更点 ▲▲▲▲▲▲▲▲▲▲
 
                 try {
                     // データベースの「自分」の場所を更新
                     const userRoleRef = ref(db, `user_roles/${currentUserId}`);
-                    await update(userRoleRef, updates);
+                    
+                    // ★★★ update() ではなく set() を使います ★★★
+                    // (set はオブジェクト全体を上書きし、.validate と相性が良いため)
+                    await set(userRoleRef, newData);
                     
                     messageEl.textContent = '保存しました！';
                     messageEl.className = 'text-sm text-green-400 text-center';
                     
-                    // データを再読み込みして表示に反映
-                    const snapshot = await get(userRoleRef);
-                    userData = snapshot.val(); // グローバル変数を更新
+                    // データを再読み込み (ローカルの userData も更新)
+                    userData = newData; 
                     loadProfileCard(user, userData); // 表示を更新
                     welcomeMessage.textContent = `${escapeHTML(userData.nickname) || escapeHTML(user.email)} 様、ようこそ。`; // ヘッダーも更新
 
@@ -429,7 +444,7 @@
 
                 } catch (error) {
                     console.error("プロフィール更新失敗:", error);
-                    messageEl.textContent = '保存に失敗しました。';
+                    messageEl.textContent = '保存に失敗しました。ルール違反の可能性があります。';
                     messageEl.className = 'text-sm text-red-400 text-center';
                 }
             });
